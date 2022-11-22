@@ -7,6 +7,10 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: default-issuer
     cert-manager.io/revision-history-limit: "1"
+
+    # Add a new headers to the response
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "X-Frame-Options: DENY";
 spec:
   ingressClassName: public
   rules:
