@@ -1,0 +1,44 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cert-manager
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: cert-manager
+    name: in-cluster
+  syncPolicy:
+    automated: {}
+    syncOptions:
+      - CreateNamespace=true
+  source:
+    repoURL: https://charts.jetstack.io
+    chart: cert-manager
+    targetRevision: v1.9.1
+    helm:
+      values: |
+        webhook:
+          tolerations:
+            - key: CriticalAddonsOnly
+              operator: Equal
+              value: "true"
+              effect: NoExecute
+          nodeSelector:
+            node-role.kubernetes.io/master: "true"
+        cainjector:
+          tolerations:
+            - key: CriticalAddonsOnly
+              operator: Equal
+              value: "true"
+              effect: NoExecute
+          nodeSelector:
+            node-role.kubernetes.io/master: "true"
+        tolerations:
+          - key: CriticalAddonsOnly
+            operator: Equal
+            value: "true"
+            effect: NoExecute
+        nodeSelector:
+          node-role.kubernetes.io/master: "true"
+        installCRDs: true

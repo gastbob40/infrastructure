@@ -1,0 +1,8 @@
+namespace: argocd
+
+resources:
+  - namespace.yml
+  - https://raw.githubusercontent.com/argoproj/argo-cd/v2.4.3/manifests/install.yaml
+
+patchesStrategicMerge:
+  - argocd-deployment.yml

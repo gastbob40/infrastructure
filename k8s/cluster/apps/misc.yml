@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cluster-misc
+  namespace: argocd
+spec:
+  project: default
+  source:
+    path: k8s/cluster/misc
+    repoURL: https://github.com/gastbob40/infrastructure.git
+    targetRevision: HEAD
+  destination:
+    namespace: cluster-misc
+    name: in-cluster
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
