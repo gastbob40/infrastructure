@@ -1,0 +1,65 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fleet
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: fleet
+  template:
+    metadata:
+      labels:
+        component: fleet
+    spec:
+      containers:
+        - name: app
+          image: gastbob40/epimac-fleet
+          imagePullPolicy: Always
+          env:
+            - name: POD_METADATA_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: NEXTAUTH_URL
+              value: https://fleet.epimac.org
+            - name: NEXTAUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: epimac-fleet-front
+                  key: NEXTAUTH_SECRET
+            - name: APPLE_ID
+              value: org.epimac.fleet
+            - name: APPLE_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: epimac-fleet-front
+                  key: APPLE_SECRET
+            - name: API_HOST
+              value: http://100.72.133.46:8000
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+      securityContext:
+        fsGroup: 2000
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - fleet
+                    - key: component
+                      operator: In
+                      values:
+                        - fleet
+                topologyKey: kubernetes.io/hostname
+      volumes:
+        - name: test
+          emptyDir: {}

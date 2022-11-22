@@ -1,0 +1,14 @@
+---
+kind: Kustomization
+namespace: epimac
+
+commonLabels:
+  app: fleet
+
+resources:
+  - namespace.yml
+  - fleet-front
+
+images:
+  - name: gastbob40/epimac-fleet
+    newTag: latest

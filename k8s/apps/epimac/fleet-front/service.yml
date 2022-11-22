@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fleet
+spec:
+  type: ClusterIP
+  selector:
+    component: fleet
+  ports:
+    - name: http
+      port: 3000
+      targetPort: http

@@ -1,0 +1,27 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "fleet-epimac"
+  namespace: "epimac"
+  annotations:
+    cert-manager.io/cluster-issuer: default-issuer
+    cert-manager.io/revision-history-limit: "1"
+spec:
+  ingressClassName: public
+  rules:
+    - host: "fleet.epimac.org"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: "fleet"
+                port:
+                  number: 3000
+  tls:
+    - hosts:
+        - "fleet.epimac.org"
+      secretName: "fleet-epimac-tls"
+
