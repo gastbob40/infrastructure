@@ -9,8 +9,7 @@ metadata:
     cert-manager.io/revision-history-limit: "1"
 
     # Add a new headers to the response
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      more_set_headers "X-Frame-Options: DENY";
+#    nginx.ingress.kubernetes.io/configuration-snippet: |
 spec:
   ingressClassName: public
   rules:
