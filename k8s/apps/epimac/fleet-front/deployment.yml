@@ -36,6 +36,18 @@ spec:
                 secretKeyRef:
                   name: epimac-fleet-front
                   key: APPLE_SECRET
+            - name: CRI_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: epimac-fleet-front
+                  key: CRI_CLIENT_ID
+            - name: CRI_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: epimac-fleet-front
+                  key: CRI_CLIENT_SECRET
+            - name: CRI_SERVER_URL
+              value: https://cri.epita.fr
             - name: API_HOST
               value: http://100.72.133.46:8000
           ports:

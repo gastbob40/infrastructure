@@ -9,4 +9,3 @@ resources:
   - ingress.yml
   - secrets.yml
   - service.yml
-  - config-map.yml
