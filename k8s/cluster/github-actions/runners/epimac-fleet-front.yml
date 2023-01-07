@@ -1,0 +1,10 @@
+---
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: RunnerDeployment
+metadata:
+  name: epimac-fleet-front-runner
+spec:
+  replicas: 1
+  template:
+    spec:
+      repository: gastbob40/epimac-fleet-front

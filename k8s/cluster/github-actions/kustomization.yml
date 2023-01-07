@@ -1,0 +1,7 @@
+---
+kind: Kustomization
+
+resources:
+  - namespace.yml
+  - secrets.yml
+  - runners/epimac-fleet-front.yml
