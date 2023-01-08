@@ -1,0 +1,14 @@
+---
+kind: Kustomization
+
+commonLabels:
+  component: frat-dump
+
+configMapGenerator:
+  - name: common-config
+    literals:
+      - DB_HOST=infra-main-cluster.postgres.svc.cluster.local
+
+resources:
+  - deployment.yml
+  - service.yml

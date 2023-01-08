@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fraternity
+  namespace: argocd
+  labels:
+    app: fraternity
+spec:
+  project: default
+  source:
+    path: k8s/apps/fraternity
+    repoURL: https://github.com/gastbob40/infrastructure.git
+    targetRevision: HEAD
+  destination:
+    name: in-cluster
+    namespace: fraternity
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

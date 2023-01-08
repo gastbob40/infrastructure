@@ -17,20 +17,12 @@ spec:
 
   # databases: name -> owner
   databases:
-    fraternity_frat_dump: fraternity.frat_dump
+    frat_dump: fraternity.frat_dump
 
   postgresql:
     version: "13"
     parameters:
       max_connections: "500"
-
-  resources:
-    requests:
-      cpu: "2"
-      memory: "2G"
-    limits:
-      cpu: "4"
-      memory: "4G"
 
   additionalVolumes:
     - name: pgbackup

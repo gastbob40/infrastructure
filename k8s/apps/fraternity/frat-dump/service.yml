@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frat-dump
+spec:
+  type: ClusterIP
+  selector:
+    component: frat-dump
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
