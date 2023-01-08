@@ -14,3 +14,4 @@ resources:
   - service.yml
   - ingress.yml
   - volume.yml
+  - cron.yml
