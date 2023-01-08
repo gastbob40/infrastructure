@@ -41,6 +41,9 @@ spec:
             - name: http
               containerPort: 8000
               protocol: TCP
+          volumeMounts:
+            - mountPath: /app/media/dumps
+              name: media-volume
       securityContext:
         fsGroup: 2000
       affinity:
@@ -59,3 +62,7 @@ spec:
                       values:
                         - frat-dump
                 topologyKey: kubernetes.io/hostname
+      volumes:
+        - name: media-volume
+          persistentVolumeClaim:
+            claimName: frat-dump-pvc-media
