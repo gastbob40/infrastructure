@@ -1,0 +1,39 @@
+---
+apiVersion: acid.zalan.do/v1
+kind: postgresql
+metadata:
+  name: infra-main-cluster
+  annotations:
+    reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+spec:
+  teamId: infra
+  volume:
+    size: 10Gi
+  numberOfInstances: 3
+
+  # users: name -> permissions (usually [])
+  users:
+    fraternity.frat_dump: []
+
+  # databases: name -> owner
+  databases:
+    fraternity_frat_dump: fraternity.frat_dump
+
+  postgresql:
+    version: "13"
+    parameters:
+      max_connections: "500"
+
+  resources:
+    requests:
+      cpu: "2"
+      memory: "2G"
+    limits:
+      cpu: "4"
+      memory: "4G"
+
+  additionalVolumes:
+    - name: pgbackup
+      mountPath: /home/postgres/pgbackup
+      volumeSource:
+        emptyDir: {}
