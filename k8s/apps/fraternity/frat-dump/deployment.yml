@@ -5,6 +5,8 @@ metadata:
   name: frat-dump
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       component: frat-dump
