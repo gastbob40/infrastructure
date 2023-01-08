@@ -12,3 +12,4 @@ configMapGenerator:
 resources:
   - deployment.yml
   - service.yml
+  - ingress.yml

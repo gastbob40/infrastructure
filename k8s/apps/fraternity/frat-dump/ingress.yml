@@ -1,0 +1,28 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "frat-dump"
+  namespace: "fraternity"
+  annotations:
+    cert-manager.io/cluster-issuer: default-issuer
+    cert-manager.io/revision-history-limit: "1"
+
+spec:
+  ingressClassName: public
+  rules:
+    - host: "dump.fraternityrp.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: "frat-dump"
+                port:
+                  number: 8000
+  tls:
+    - hosts:
+        - "dump.fraternityrp.com"
+      secretName: "frat-dump-tls"
+
