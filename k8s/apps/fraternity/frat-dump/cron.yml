@@ -4,6 +4,7 @@ metadata:
   name: frat-dump
 spec:
   schedule: "0 */6 * * *" # every 6 hours
+  successfulJobsHistoryLimit: 0
   jobTemplate:
     spec:
       template:
