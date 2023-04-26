@@ -1,0 +1,34 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "admin-fraternity"
+  namespace: "admin"
+  annotations:
+    cert-manager.io/cluster-issuer: default-issuer
+    cert-manager.io/revision-history-limit: "1"
+    nginx.ingress.kubernetes.io/http2-enabled: "false"
+    nginx.ingress.kubernetes.io/connection-proxy-header: "keep-alive"
+
+    # Add a new headers to the response
+#    nginx.ingress.kubernetes.io/configuration-snippet: |
+#      more_set_headers "X-Frame-Options: SAMEORIGIN";
+
+spec:
+  ingressClassName: public
+  rules:
+    - host: "admin.fraternityrp.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: "admin"
+                port:
+                  number: 3000
+  tls:
+    - hosts:
+        - "admin.fraternityrp.com"
+      secretName: "admin-fraternity-tls"
+

@@ -8,7 +8,10 @@ commonLabels:
 resources:
   - namespace.yml
   - frat-dump
+  - frat-dashboard
 
 images:
   - name: systemfraternity/frat_dump
+    newTag: latest
+  - name: systemfraternity/frat_dashboard
     newTag: latest
