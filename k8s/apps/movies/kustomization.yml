@@ -1,0 +1,14 @@
+---
+kind: Kustomization
+namespace: movies
+
+commonLabels:
+  app: movies
+
+resources:
+  - namespace.yml
+
+  - volume.yml
+  - volume-claim.yml
+
+  - radarr

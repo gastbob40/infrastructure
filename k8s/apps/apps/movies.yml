@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: movies
+  namespace: argocd
+  labels:
+    app: movies
+spec:
+  project: default
+  source:
+    path: k8s/apps/movies
+    repoURL: https://github.com/gastbob40/infrastructure.git
+    targetRevision: HEAD
+  destination:
+    name: in-cluster
+    namespace: movies
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
