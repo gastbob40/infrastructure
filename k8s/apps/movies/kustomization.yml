@@ -12,3 +12,4 @@ resources:
   - volume-claim.yml
 
   - radarr
+  - sonarr

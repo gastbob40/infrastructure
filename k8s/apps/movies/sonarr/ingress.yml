@@ -1,0 +1,25 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sonarr
+  annotations:
+    cert-manager.io/cluster-issuer: default-issuer
+    cert-manager.io/revision-history-limit: "1"
+
+spec:
+  rules:
+    - host: sonarr.movies.gastbob40.ovh
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: sonarr
+                port:
+                  name: http
+  tls:
+    - hosts:
+        - sonarr.movies.gastbob40.ovh
+      secretName: sonarr-movies-tls
