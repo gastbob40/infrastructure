@@ -9,6 +9,8 @@ metadata:
     cert-manager.io/revision-history-limit: "1"
     nginx.ingress.kubernetes.io/http2-enabled: "false"
     nginx.ingress.kubernetes.io/connection-proxy-header: "keep-alive"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"  # 120 seconds, but you can adjust as necessary
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "120"  # This is optional but is for the timeout for sending data to the backend
 
 spec:
   ingressClassName: public
