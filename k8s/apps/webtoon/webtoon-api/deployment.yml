@@ -1,0 +1,46 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webtoon-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: webtoon-api
+  template:
+    metadata:
+      labels:
+        component: webtoon-api
+    spec:
+      containers:
+        - name: app
+          image: gastbob40/webtoon-api
+          imagePullPolicy: Always
+          env:
+            - name: POD_METADATA_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+      securityContext:
+        fsGroup: 2000
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - webtoon-api
+                    - key: component
+                      operator: In
+                      values:
+                        - webtoon-api
+                topologyKey: kubernetes.io/hostname

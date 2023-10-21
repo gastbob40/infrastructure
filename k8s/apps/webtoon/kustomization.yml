@@ -1,0 +1,10 @@
+---
+kind: Kustomization
+namespace: webtoon
+
+commonLabels:
+  app: webtoon
+
+resources:
+  - namespace.yml
+  - webtoon-api

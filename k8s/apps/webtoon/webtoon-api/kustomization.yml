@@ -1,0 +1,10 @@
+---
+kind: Kustomization
+
+commonLabels:
+  component: webtoon-api
+
+resources:
+  - deployment.yml
+  - ingress.yml
+  - service.yml
