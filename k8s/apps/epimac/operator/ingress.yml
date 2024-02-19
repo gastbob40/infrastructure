@@ -9,6 +9,8 @@ metadata:
     cert-manager.io/revision-history-limit: "1"
     nginx.ingress.kubernetes.io/http2-enabled: "false"
     nginx.ingress.kubernetes.io/connection-proxy-header: "keep-alive"
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "32"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
 spec:
   ingressClassName: public
   rules:
