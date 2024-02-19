@@ -1,0 +1,11 @@
+---
+kind: Kustomization
+
+commonLabels:
+  component: operator
+
+resources:
+  - deployment.yml
+  - ingress.yml
+  - secrets.yml
+  - service.yml

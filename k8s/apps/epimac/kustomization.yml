@@ -8,7 +8,10 @@ commonLabels:
 resources:
   - namespace.yml
   - fleet-front
+  - operator
 
 images:
   - name: gastbob40/epimac-fleet
+    newTag: latest
+  - name: gastbob40/operator
     newTag: latest
