@@ -24,6 +24,8 @@ spec:
                   fieldPath: metadata.uid
             - name: NEXTAUTH_URL
               value: https://meal-planner.gastbob40.ovh
+            - name: NEXT_PUBLIC_MEAL_PLANNER_API
+              value: https://api.meal-planner.gastbob40.ovh
           ports:
             - name: http
               containerPort: 3000
