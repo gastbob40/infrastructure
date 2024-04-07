@@ -1,0 +1,11 @@
+---
+kind: Kustomization
+namespace: minio
+
+resources:
+  - deployment.yml
+  - ingress.yml
+  - pvc.yml
+  - secrets.yml
+  - service.yml
+
