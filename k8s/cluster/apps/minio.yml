@@ -1,17 +1,79 @@
+---
+apiVersion: ricoberger.de/v1alpha1
+kind: VaultSecret
+metadata:
+  name: minio-secrets
+  namespace: minio
+spec:
+  path: k8s/minio
+  keys:
+    - root-user
+    - root-password
+  type: Opaque
+
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: minio
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    app: minio
 spec:
-  project: default
-  source:
-    path: k8s/cluster/minio
-    repoURL: https://github.com/gastbob40/infrastructure.git
-    targetRevision: HEAD
-  destination:
-    namespace: minio
-    name: in-cluster
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
+    automated:
+      prune: true
+  destination:
+    name: in-cluster
+    namespace: minio
+  project: default
+  source:
+    repoURL: https://charts.bitnami.com/bitnami
+    targetRevision: 12.8.4
+    chart: minio
+    helm:
+      values: |
+        extraEnvVars:
+          - name: MINIO_BROWSER_REDIRECT_URL
+            value: https://s3.gastbob40.ovh
+          - name: MINIO_SERVER_URL
+            value: https://api.s3.gastbob40.ovh
+          - name: MINIO_ROOT_USER
+            valueFrom:
+              secretKeyRef:
+                name: minio-secrets
+                key: root-user
+          - name: MINIO_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: minio-secrets
+                key: root-password
+        auth:
+          existingSecret: "minio-secrets"
+        ingress:
+          enabled: true
+          ingressClassName: "public"
+          hostname: s3.gastbob40.ovh
+          pathType: Prefix
+          annotations:
+            cert-manager.io/cluster-issuer: default-issuer
+            cert-manager.io/revision-history-limit: "1"
+            nginx.ingress.kubernetes.io/proxy-body-size: "4G"
+          tls: true
+        apiIngress:
+          enabled: true
+          ingressClassName: "public"
+          hostname: api.s3.gastbob40.ovh
+          pathType: Prefix
+          annotations:
+            cert-manager.io/cluster-issuer: default-issuer
+            cert-manager.io/revision-history-limit: "1"
+            nginx.ingress.kubernetes.io/proxy-body-size: "4G"
+          tls: true
+        persistence:
+          size: 50Gi
+          
