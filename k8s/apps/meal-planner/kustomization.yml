@@ -8,3 +8,4 @@ commonLabels:
 resources:
   - namespace.yml
   - meal-planner-api
+  - meal-planner-frontend

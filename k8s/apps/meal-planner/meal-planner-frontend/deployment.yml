@@ -1,0 +1,30 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: meal-planner-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: meal-planner-frontend
+  template:
+    metadata:
+      labels:
+        component: meal-planner-api
+    spec:
+      containers:
+        - name: app
+          image: gastbob40/meal-planner-frontend
+          imagePullPolicy: Always
+          env:
+            - name: POD_METADATA_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: NEXTAUTH_URL
+              value: https://meal-planner.gastbob40.ovh
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP

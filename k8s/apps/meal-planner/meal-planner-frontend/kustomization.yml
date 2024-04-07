@@ -1,0 +1,11 @@
+---
+kind: Kustomization
+
+commonLabels:
+  component: meal-planner-frontend
+
+resources:
+  - deployment.yml
+  - service.yml
+  - ingress.yml
+
