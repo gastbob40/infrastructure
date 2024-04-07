@@ -1,0 +1,17 @@
+---
+kind: Kustomization
+
+commonLabels:
+  component: meal-planner-api
+
+configMapGenerator:
+  - name: common-config
+    literals:
+      - DB_HOST=infra-main-cluster.postgres.svc.cluster.local
+
+resources:
+  - deployment.yml
+  - secrets.yml
+  - service.yml
+  - ingress.yml
+

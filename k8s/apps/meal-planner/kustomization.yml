@@ -1,0 +1,10 @@
+---
+kind: Kustomization
+namespace: meal-planner
+
+commonLabels:
+  app: meal-planner
+
+resources:
+  - namespace.yml
+  - meal-planner-api

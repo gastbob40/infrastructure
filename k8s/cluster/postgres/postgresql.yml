@@ -14,12 +14,12 @@ spec:
   # users: name -> permissions (usually [])
   users:
     fraternity.frat_dump: []
-    meal_planner.meal_planner: []
+    meal-planner.meal_planner_api: []
 
   # databases: name -> owner
   databases:
     frat_dump: fraternity.frat_dump
-    meal_planner: meal_planner.meal_planner
+    meal_planner_api: meal-planner.meal_planner_api
 
   postgresql:
     version: "13"

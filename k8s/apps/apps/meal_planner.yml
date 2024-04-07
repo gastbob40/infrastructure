@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: meal-planner
+  namespace: argocd
+  labels:
+    app: meal-planner
+spec:
+  project: default
+  source:
+    path: k8s/apps/meal-planner
+    repoURL: https://github.com/gastbob40/infrastructure.git
+    targetRevision: HEAD
+  destination:
+    name: in-cluster
+    namespace: meal-planner
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

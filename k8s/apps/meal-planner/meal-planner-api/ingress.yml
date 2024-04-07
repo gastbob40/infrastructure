@@ -1,0 +1,28 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "meal-planner-api"
+  namespace: "meal-planner"
+  annotations:
+    cert-manager.io/cluster-issuer: default-issuer
+    cert-manager.io/revision-history-limit: "1"
+
+spec:
+  ingressClassName: public
+  rules:
+    - host: "api.meal-planner.gastbob40.ovh"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: "meal-planner-api"
+                port:
+                  number: 8080
+  tls:
+    - hosts:
+        - "api.meal-planner.gastbob40.ovh"
+      secretName: "api.meal-planner.gastbob40.ovh-tls"
+

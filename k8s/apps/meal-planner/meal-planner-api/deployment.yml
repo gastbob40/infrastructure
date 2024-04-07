@@ -1,0 +1,57 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: meal-planner-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: meal-planner-api
+  template:
+    metadata:
+      labels:
+        component: meal-planner-api
+    spec:
+      containers:
+        - name: app
+          image: gastbob40/meal-planner-api
+          imagePullPolicy: Always
+          env:
+            - name: POD_METADATA_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: DATASOURCE_HOST
+              value: infra-main-cluster.postgres.svc.cluster.local
+            - name: DATASOURCE_DB
+              value: meal_planner_api
+            - name: DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: meal-planner.meal-planner-api.infra-main-cluster.credentials.postgresql.acid.zalan.do
+                  key: username
+            - name: DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: meal-planner.meal-planner-api.infra-main-cluster.credentials.postgresql.acid.zalan.do
+                  key: password
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secrets
+                  key: root-user
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secrets
+                  key: root-password
+            - name: MINIO_URL
+              value: https://api.s3.gastbob40.ovh
+          envFrom:
+            - configMapRef:
+                name: common-config
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
