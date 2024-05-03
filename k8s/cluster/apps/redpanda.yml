@@ -1,0 +1,54 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: redpanda
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://charts.redpanda.com
+    targetRevision: 5.8.3
+    chart: redpanda
+    helm:
+      values: |
+        statefulset:
+          replicas: 1
+  destination:
+    namespace: redpanda
+    name: in-cluster
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: redpanda-console-ingress
+  namespace: redpanda
+  annotations:
+    cert-manager.io/cluster-issuer: default-issuer
+    cert-manager.io/revision-history-limit: "1"
+
+spec:
+  ingressClassName: public
+  rules:
+    - host: "kafka-console.gastbob40.ovh"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: "redpanda-console"
+                port:
+                  number: 8080
+  tls:
+    - hosts:
+        - "kafka-console.gastbob40.ovh"
+      secretName: "redpanda-console-tls"
