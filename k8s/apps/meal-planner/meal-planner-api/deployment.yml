@@ -58,6 +58,8 @@ spec:
                 secretKeyRef:
                   name: meal-planner-backend-secrets
                   key: HELLOFRESH_PASSWORD
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: redpanda.redpanda.svc.cluster.local:9093
           envFrom:
             - configMapRef:
                 name: common-config

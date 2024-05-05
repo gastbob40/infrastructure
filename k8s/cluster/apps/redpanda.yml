@@ -15,6 +15,10 @@ spec:
       values: |
         statefulset:
           replicas: 1
+        listeners:
+          kafka:
+            tls:
+              enabled: false
 
   destination:
     namespace: redpanda
