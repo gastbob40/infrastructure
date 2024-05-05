@@ -48,6 +48,16 @@ spec:
                   key: root-password
             - name: MINIO_URL
               value: https://api.s3.gastbob40.ovh
+            - name: HELLOFRESH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: meal-planner-backend-secrets
+                  key: HELLOFRESH_USERNAME
+            - name: HELLOFRESH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: meal-planner-backend-secrets
+                  key: HELLOFRESH_PASSWORD
           envFrom:
             - configMapRef:
                 name: common-config
