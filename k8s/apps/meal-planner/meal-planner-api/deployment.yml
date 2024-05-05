@@ -60,6 +60,8 @@ spec:
                   key: HELLOFRESH_PASSWORD
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: redpanda.redpanda.svc.cluster.local:9093
+            - name: FLARESOLVERR_URL
+              value: http://flaresolverr.flaresolverr.svc.cluster.local:8191/v1
           envFrom:
             - configMapRef:
                 name: common-config
