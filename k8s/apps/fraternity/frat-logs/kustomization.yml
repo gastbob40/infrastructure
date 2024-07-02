@@ -1,0 +1,12 @@
+---
+kind: Kustomization
+
+commonLabels:
+  component: frat-logs
+
+resources:
+  - deployment.yml
+  - ingress.yml
+  - secrets.yml
+  - service.yml
+

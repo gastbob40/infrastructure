@@ -1,0 +1,92 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frat-logs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: frat-logs
+  template:
+    metadata:
+      labels:
+        component: frat-logs
+    spec:
+      containers:
+        - name: app
+          image: systemfraternity/frat_logs
+          imagePullPolicy: Always
+          env:
+            - name: POD_METADATA_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: DB_NAME
+              value: frat_logs
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: fraternity.frat-logs.infra-main-cluster.credentials.postgresql.acid.zalan.do
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: fraternity.frat-logs.infra-main-cluster.credentials.postgresql.acid.zalan.do
+                  key: password
+            - name: DATABASE_URL
+              value: postgresql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):5432/$(DB_NAME)?serverVersion=14&charset=utf8
+            - name: APP_ENV
+              value: 'prod'
+            - name: APP_MAINTENANCE
+              value: 'false'
+            - name: OAUTH_DISCORD_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: frat-log-secrets
+                  key: OAUTH_DISCORD_CLIENT_ID
+            - name: OAUTH_DISCORD_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: frat-log-secrets
+                  key: OAUTH_DISCORD_CLIENT_SECRET
+            - name: STEAM_ID
+              valueFrom:
+                secretKeyRef:
+                  name: frat-log-secrets
+                  key: STEAM_ID
+            - name: DISCORD_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: frat-log-secrets
+                  key: DISCORD_BOT_TOKEN
+            - name: API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: frat-log-secrets
+                  key: API_TOKEN
+          envFrom:
+            - configMapRef:
+                name: common-config
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+      securityContext:
+        fsGroup: 2000
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - frat-logs
+                    - key: component
+                      operator: In
+                      values:
+                        - frat-logs
+                topologyKey: kubernetes.io/hostname

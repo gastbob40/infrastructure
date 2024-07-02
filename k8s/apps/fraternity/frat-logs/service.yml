@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frat-logs
+spec:
+  type: ClusterIP
+  selector:
+    component: frat-logs
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
