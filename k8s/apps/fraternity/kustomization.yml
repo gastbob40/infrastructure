@@ -9,6 +9,7 @@ resources:
   - namespace.yml
   - frat-dump
   - frat-logs
+  - frat-shop
 
 images:
   - name: systemfraternity/frat_dump

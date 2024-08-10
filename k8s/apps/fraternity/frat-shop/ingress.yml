@@ -1,0 +1,28 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "frat-shop"
+  namespace: "fraternity"
+  annotations:
+    cert-manager.io/cluster-issuer: default-issuer
+    cert-manager.io/revision-history-limit: "1"
+
+spec:
+  ingressClassName: public
+  rules:
+    - host: "shop.fraternity.gastbob40.ovh"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: "frat-shop"
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - "shop.fraternity.gastbob40.ovh"
+      secretName: "frat-shop-tls"
+

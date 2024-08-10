@@ -1,0 +1,87 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frat-shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: frat-shop
+  template:
+    metadata:
+      labels:
+        component: frat-shop
+    spec:
+      containers:
+        - name: app
+          image: systemfraternity/frat_shop
+          imagePullPolicy: Always
+          env:
+            - name: POD_METADATA_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: DB_NAME
+              value: frat_shop
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: fraternity.frat-shop.infra-main-cluster.credentials.postgresql.acid.zalan.do
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: fraternity.frat-shop.infra-main-cluster.credentials.postgresql.acid.zalan.do
+                  key: password
+            - name: DATABASE_URL
+              value: postgresql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):5432/$(DB_NAME)?serverVersion=14&charset=utf8
+            - name: APP_ENV
+              value: 'prod'
+            - name: APP_MAINTENANCE
+              value: 'false'
+            - name: STEAM_ID
+              valueFrom:
+                secretKeyRef:
+                  name: frat-shop-secrets
+                  key: STEAM_ID
+            - name: TEBEX_IP_WHITELIST
+              valueFrom:
+                secretKeyRef:
+                  name: frat-shop-secrets
+                  key: TEBEX_IP_WHITELIST
+            - name: TEBEX_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: frat-shop-secrets
+                  key: TEBEX_SECRET
+            - name: TEBEX_WEBHOOK_WHITELIST
+              valueFrom:
+                secretKeyRef:
+                  name: frat-shop-secrets
+                  key: TEBEX_WEBHOOK_WHITELIST
+          envFrom:
+            - configMapRef:
+                name: common-config
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+      securityContext:
+        fsGroup: 2000
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - frat-shop
+                    - key: component
+                      operator: In
+                      values:
+                        - frat-shop
+                topologyKey: kubernetes.io/hostname
