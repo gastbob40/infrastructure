@@ -22,3 +22,11 @@ spec:
           ingressClassResource:
             name: public
             default: true
+          config:
+            allow-snippet-annotations: "true"
+            enable-real-ip: "true"
+            forwarded-for-header: "true"
+          service:
+            annotations:
+              kubernetes.civo.com/loadbalancer-enable-proxy-protocol: send-proxy
+            externalTrafficPolicy: Local
