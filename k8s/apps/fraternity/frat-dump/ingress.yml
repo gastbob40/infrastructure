@@ -11,7 +11,7 @@ metadata:
 spec:
   ingressClassName: public
   rules:
-    - host: "dump.fraternityrp.com"
+    - host: "dump.fraternity.gastbob40.ovh"
       http:
         paths:
           - path: /
@@ -23,6 +23,6 @@ spec:
                   number: 8000
   tls:
     - hosts:
-        - "dump.fraternityrp.com"
+        - "dump.fraternity.gastbob40.ovh"
       secretName: "frat-dump-tls"
 
