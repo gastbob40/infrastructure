@@ -33,7 +33,7 @@ spec:
   project: default
   source:
     repoURL: https://charts.bitnami.com/bitnami
-    targetRevision: 12.8.4
+    targetRevision: 14.7.15
     chart: minio
     helm:
       values: |
