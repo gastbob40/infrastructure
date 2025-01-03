@@ -1,0 +1,28 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Pluto
+        uses: FairwindsOps/pluto/github-action@master
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Use pluto
+        run: |
+          mkdir -p pluto-results
+          pluto detect-files -d ./k8s --output wide > pluto-results/pluto-report.txt
+          echo "Pluto Report:" && cat pluto-results/pluto-report.txt
+
+      - name: Upload Pluto Report as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pluto-deprecation-report
+          path: pluto-results/pluto-report.txt
