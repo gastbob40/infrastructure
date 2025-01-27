@@ -1,0 +1,47 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: keycloak
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    app: keycloak
+spec:
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+  destination:
+    name: in-cluster
+    namespace: keycloak
+  project: default
+  source:
+    repoURL: registry-1.docker.io/bitnamicharts
+    chart: keycloak
+    targetRevision: 24.4.5
+    helm:
+      values: |
+        postgresql:
+          enabled: false
+        externalDatabase:
+          host: infra-main-cluster.postgres.svc.cluster.local
+          port: 5432
+          existingSecret: keycloak.keycloak.infra-main-cluster.credentials.postgresql.acid.zalan.do
+          database: keycloak_db
+          existingSecretUserKey: username
+          existingSecretPasswordKey: password
+        
+        ingress:
+          enabled: true
+          ingressClassName: "public"
+          hostname: auth.gastbob40.ovh
+          pathType: Prefix
+          annotations:
+            cert-manager.io/cluster-issuer: default-issuer
+            cert-manager.io/revision-history-limit: "1"
+            nginx.ingress.kubernetes.io/proxy-body-size: "4G"
+          tls: true
+          

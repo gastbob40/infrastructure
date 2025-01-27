@@ -25,7 +25,7 @@ spec:
     frat_logs: fraternity.frat_logs
     frat_shop: fraternity.frat_shop
     meal_planner_api: meal-planner.meal_planner_api
-    keycloak: keycloak.keycloak
+    keycloak_db: keycloak.keycloak
 
   postgresql:
     version: "13"
