@@ -52,9 +52,6 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: default-issuer
     cert-manager.io/revision-history-limit: "1"
-    nginx.ingress.kubernetes.io/auth-type: "basic"
-    nginx.ingress.kubernetes.io/auth-secret: "redpanda-secrets"
-    nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
 
 spec:
   ingressClassName: public
