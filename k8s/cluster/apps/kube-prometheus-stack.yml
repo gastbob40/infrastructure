@@ -1,0 +1,131 @@
+---
+apiVersion: ricoberger.de/v1alpha1
+kind: VaultSecret
+metadata:
+  name: grafana-secrets
+  namespace: monitoring
+spec:
+  path: k8s/grafana/oidc
+  keys:
+    - client_id
+    - client_secret
+  type: Opaque
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: monitoring
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    app: monitoring
+spec:
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    automated:
+      prune: true
+  destination:
+    name: in-cluster
+    namespace: monitoring
+  project: default
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    targetRevision: 68.3.2
+    helm:
+      values: |
+        prometheus:
+            storageSpec:
+              volumeClaimTemplate:
+                spec:
+                  storageClassName: longhorn
+                  accessModes: ["ReadWriteOnce"]
+                  resources:
+                    requests:
+                      storage: 5Gi
+        grafana:
+          dashboardProviders:
+            dashboardproviders.yaml:
+              apiVersion: 1
+              providers:
+                - name: 'grafana-dashboards-kubernetes'
+                  orgId: 1
+                  folder: 'Kubernetes'
+                  type: file
+                  disableDeletion: true
+                  editable: true
+                  options:
+                    path: /var/lib/grafana/dashboards/grafana-dashboards-kubernetes
+          dashboards:
+            grafana-dashboards-kubernetes:
+              k8s-system-api-server:
+                url: https://raw.githubusercontent.com/gastbob40/infrastructure/main/dashboards/k8s-system-api-server.json
+                token: ''
+              k8s-system-coredns:
+                url: https://raw.githubusercontent.com/gastbob40/infrastructure/main/dashboards/k8s-system-coredns.json
+                token: ''
+              k8s-views-global:
+                url: https://raw.githubusercontent.com/gastbob40/infrastructure/main/dashboards/k8s-views-global.json
+                token: ''
+              k8s-views-namespaces:
+                url: https://raw.githubusercontent.com/gastbob40/infrastructure/main/dashboards/k8s-views-namespaces.json
+                token: ''
+              k8s-views-nodes:
+                url: https://raw.githubusercontent.com/gastbob40/infrastructure/main/dashboards/k8s-views-nodes.json
+                token: ''
+              k8s-views-pods:
+                url: https://raw.githubusercontent.com/gastbob40/infrastructure/main/dashboards/k8s-views-pods.json
+                token: ''
+            
+          ingress:
+            enabled: true
+            ingressClassName: public
+            pathType: Prefix
+            annotations:
+              cert-manager.io/cluster-issuer: default-issuer
+              cert-manager.io/revision-history-limit: "1"
+              nginx.ingress.kubernetes.io/proxy-body-size: "4G"
+        
+            hosts:
+              - grafana.gastbob40.ovh
+            tls:
+              - secretName: grafana-tls-secrets
+                hosts:
+                - grafana.gastbob40.ovh
+          grafana.ini:
+            server:
+              root_url: https://grafana.gastbob40.ovh
+            auth:
+              oauth_auto_login: false
+              disable_login_form: true
+              oauth_allow_insecure_email_lookup: true
+
+            auth.generic_oauth:
+              enabled: true
+              name: "Keycloak SSO"
+              allow_sign_up: true
+        
+              client_id: $__file{/etc/secrets/auth_oidc/client_id}
+              client_secret: $__file{/etc/secrets/auth_oidc/client_secret}
+              scopes: openid
+              login_attribute_path: email
+              name_attribute_path: name
+              
+              role_attribute_path: contains(roles[*], 'grafana-admin') && 'GrafanaAdmin' || contains(roles[*], 'admin') && 'Admin' || contains(roles[*], 'editor') && 'Editor' || 'Viewer'
+              allow_assign_grafana_admin: true
+        
+              auth_url: https://auth.gastbob40.ovh/realms/Kubernetes/protocol/openid-connect/auth
+              token_url: https://auth.gastbob40.ovh/realms/Kubernetes/protocol/openid-connect/token
+              api_url: https://auth.gastbob40.ovh/realms/Kubernetes/protocol/openid-connect/userinfo
+          
+          extraSecretMounts:
+            - name: grafana-auth-oidc
+              secretName: grafana-secrets
+              defaultMode: 0440
+              mountPath: /etc/secrets/auth_oidc
+              readOnly: true
+
