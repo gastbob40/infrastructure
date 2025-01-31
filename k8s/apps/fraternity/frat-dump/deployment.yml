@@ -13,6 +13,8 @@ spec:
       labels:
         component: frat-dump
     spec:
+      nodeSelector:
+        node-role.kubernetes.io/master: "true"
       containers:
         - name: app
           image: systemfraternity/frat_dump
