@@ -32,6 +32,8 @@ spec:
               storage "file" {
                 path = "/vault/data"
               }
+          nodeSelector:
+            node-role.kubernetes.io/master: "true"
           volumes:
             - name: tls
               secret:
