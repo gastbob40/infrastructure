@@ -76,4 +76,6 @@ spec:
           tls: true
         persistence:
           size: 50Gi
+        nodeSelector:
+          node-role.kubernetes.io/master: "true"
           

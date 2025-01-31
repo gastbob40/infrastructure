@@ -19,7 +19,6 @@ spec:
     namespace: flaresolverr
   project: default
   source:
-    repoURL: https://charts.truecharts.org
-    targetRevision: 13.8.10
+    repoURL: https://k8s-home-lab.github.io/helm-charts/
+    targetRevision: 6.0.3
     chart: flaresolverr
-
