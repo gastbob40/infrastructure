@@ -10,7 +10,6 @@ spec:
     - root-password
   type: Opaque
 
-
 ---
 
 apiVersion: batch/v1
@@ -20,6 +19,8 @@ metadata:
   namespace: postgres
 spec:
   schedule: "0 2 * * *"
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 0
   jobTemplate:
     spec:
       template:
