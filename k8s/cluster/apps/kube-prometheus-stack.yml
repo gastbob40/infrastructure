@@ -119,9 +119,9 @@ spec:
               role_attribute_path: contains(roles[*], 'grafana-admin') && 'GrafanaAdmin' || contains(roles[*], 'admin') && 'Admin' || contains(roles[*], 'editor') && 'Editor' || 'Viewer'
               allow_assign_grafana_admin: true
         
-              auth_url: https://auth.gastbob40.ovh/realms/Kubernetes/protocol/openid-connect/auth
-              token_url: https://auth.gastbob40.ovh/realms/Kubernetes/protocol/openid-connect/token
-              api_url: https://auth.gastbob40.ovh/realms/Kubernetes/protocol/openid-connect/userinfo
+              auth_url: https://auth.gastbob40.ovh/realms/infra/protocol/openid-connect/auth
+              token_url: https://auth.gastbob40.ovh/realms/infra/protocol/openid-connect/token
+              api_url: https://auth.gastbob40.ovh/realms/infra/protocol/openid-connect/userinfo
           
           extraSecretMounts:
             - name: grafana-auth-oidc
