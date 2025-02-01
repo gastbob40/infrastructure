@@ -5,3 +5,4 @@ namespace: postgres
 resources:
   - namespace.yml
   - postgresql.yml
+  - backup.yml
