@@ -47,6 +47,10 @@ spec:
                   resources:
                     requests:
                       storage: 5Gi
+        prometheus-node-exporter:
+          hostNetwork: false
+          service:
+            hostPort: false
         grafana:
           revisionHistoryLimit: 0
           dashboardProviders:
