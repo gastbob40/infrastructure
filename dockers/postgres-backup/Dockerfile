@@ -17,4 +17,7 @@ RUN  apt-get update && apt-get install -y curl unzip postgresql jq && \
 COPY backup.sh /usr/local/bin/backup.sh
 RUN chmod +x /usr/local/bin/backup.sh
 
+COPY glacier.sh /usr/local/bin/glacier.sh
+RUN chmod +x /usr/local/bin/glacier.sh
+
 ENTRYPOINT ["/usr/local/bin/backup.sh"]

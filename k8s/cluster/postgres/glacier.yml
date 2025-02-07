@@ -1,0 +1,72 @@
+apiVersion: ricoberger.de/v1alpha1
+kind: VaultSecret
+metadata:
+  name: minio-secrets
+  namespace: postgres
+spec:
+  path: k8s/minio
+  keys:
+    - root-user
+    - root-password
+  type: Opaque
+
+---
+
+apiVersion: ricoberger.de/v1alpha1
+kind: VaultSecret
+metadata:
+  name: aws-secrets
+  namespace: postgres
+spec:
+  path: k8s/minio
+  keys:
+    - root-user
+    - root-password
+  type: Opaque
+
+---
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: pg-backup
+  namespace: postgres
+spec:
+  schedule: "0 2 * * *"
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 0
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: pg-backup
+              image: gastbob40/postgres-backup:latest
+              imagePullPolicy: Always
+              env:
+                - name: PG_USER
+                  value: "postgres"
+                - name: PG_HOST
+                  value: "infra-main-cluster.postgres.svc.cluster.local"
+                - name: PG_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: postgres.infra-main-cluster.credentials.postgresql.acid.zalan.do
+                      key: password
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: minio-secrets
+                      key: root-user
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: minio-secrets
+                      key: root-password
+                - name: AWS_ENDPOINT_URL
+                  value: "https://api.s3.gastbob40.ovh"
+                - name: AWS_REGION
+                  value: "us-east-1"
+                - name: S3_BUCKET
+                  value: "postgres-backups"
+          restartPolicy: OnFailure
