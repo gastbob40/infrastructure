@@ -2,7 +2,7 @@
 
 FROM ubuntu:24.04
 
-RUN  apt-get update && apt-get install -y curl unzip postgresql jq && \
+RUN  apt-get update && apt-get install -y curl unzip zip postgresql-client jq && \
     ARCH=$(uname -m) && \
         if [ "$ARCH" = "aarch64" ]; then \
             echo "Detected ARM64 architecture, installing AWS CLI for ARM64..." && \

@@ -6,4 +6,5 @@ resources:
   - namespace.yml
   - postgresql.yml
   - backup.yml
+  - glacier.yml
   - secrets.yml

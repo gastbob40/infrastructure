@@ -1,15 +1,8 @@
-# export AWS_ACCESS_KEY_ID_PRIVATE="TON_ACCESS_KEY_S3_PRIVÉ"
-# export AWS_SECRET_ACCESS_KEY_PRIVATE="TON_SECRET_KEY_S3_PRIVÉ"
-# export AWS_ENDPOINT_S3_PRIVATE="https://api.s3.gastbob40.ovh"  # URL de ton S3 privé
+#!/bin/bash
 
-# 🔹 Configurer les identifiants pour AWS S3 Glacier
-# export AWS_ACCESS_KEY_ID_GLACIER="TON_ACCESS_KEY_AWS_S3"
-# export AWS_SECRET_ACCESS_KEY_GLACIER="TON_SECRET_KEY_AWS_S3"
-# export AWS_REGION_GLACIER="eu-central-1"
-# export AWS_BUCKET_GLACIER="backups"
+set -e
 
-
-AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_PRIVATE AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_PRIVATE aws s3api put-bucket-lifecycle-configuration --bucket backups --region eu-central-1 --lifecycle-configuration '{
+AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID_GLACIER AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY_GLACIER aws s3api put-bucket-lifecycle-configuration --bucket "$AWS_BUCKET_GLACIER" --region "$AWS_REGION_GLACIER" --lifecycle-configuration '{
   "Rules": [
     {
       "ID": "DeleteBackupsAfter1Year",
