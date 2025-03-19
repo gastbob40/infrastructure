@@ -2,5 +2,17 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended"
-  ]
+  ],
+  "argocd": {
+    "fileMatch": [
+      "^k8s/cluster/apps/.+\\.ya?ml$"
+    ]
+  },
+  "kubernetes": {
+    "fileMatch": ["^k8s/.+\\.ya?ml$"]
+  },
+  "kustomize": {
+    "fileMatch": ["kustomization\\.ya?ml$"]
+  },
+  "prTitle": "k8s: apps: upgrade {{depName}} to {{newVersion}}"
 }
