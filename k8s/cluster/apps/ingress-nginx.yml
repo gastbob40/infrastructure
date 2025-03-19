@@ -14,19 +14,24 @@ spec:
   source:
     repoURL: https://kubernetes.github.io/ingress-nginx
     chart: ingress-nginx
-    targetRevision: 4.2.4
+    targetRevision: 4.12.0
     helm:
       values: |
         controller:
+          kind: DaemonSet
+        
           ingressClass: public
           ingressClassResource:
             name: public
             default: true
+        
           config:
             allow-snippet-annotations: "true"
-            enable-real-ip: "true"
-            forwarded-for-header: "true"
+            real-ip-header: "X-Forwarded-For"
+            forwarded-for-header: "X-Forwarded-For"
+            real-ip-recursive: "true"
+            compute-full-forwarded-for: "true"
+            use-forwarded-headers: "true"
+            set-real-ip-from: "0.0.0.0/0"
           service:
-            annotations:
-              kubernetes.civo.com/loadbalancer-enable-proxy-protocol: send-proxy
             externalTrafficPolicy: Local
