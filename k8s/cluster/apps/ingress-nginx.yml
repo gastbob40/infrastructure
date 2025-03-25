@@ -18,7 +18,10 @@ spec:
     helm:
       values: |
         controller:
-          kind: DaemonSet
+          # kind: DaemonSet
+        
+          nodeSelector:
+            node-role.kubernetes.io/master: "true"
         
           ingressClass: public
           ingressClassResource:
