@@ -69,6 +69,10 @@ spec:
               protocol: TCP
       securityContext:
         fsGroup: 2000
+
+      nodeSelector:
+        node-role.kubernetes.io/master: "true"
+
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
