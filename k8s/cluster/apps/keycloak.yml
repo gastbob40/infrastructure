@@ -21,7 +21,7 @@ spec:
   source:
     repoURL: registry-1.docker.io/bitnamicharts
     chart: keycloak
-    targetRevision: 24.4.13
+    targetRevision: 24.4.14
     helm:
       values: |
         postgresql:
