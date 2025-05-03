@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cocfr
+  namespace: argocd
+  labels:
+    app: cocfr
+spec:
+  project: default
+  source:
+    path: k8s/apps/cocfr
+    repoURL: https://github.com/gastbob40/infrastructure.git
+    targetRevision: HEAD
+  destination:
+    name: in-cluster
+    namespace: cocfr
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

@@ -1,0 +1,7 @@
+---
+kind: Kustomization
+namespace: cocfr
+
+resources:
+  - namespace.yml
+  - clash-birthday

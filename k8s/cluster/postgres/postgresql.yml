@@ -16,6 +16,7 @@ spec:
     fraternity.frat_dump: []
     fraternity.frat_logs: []
     fraternity.frat_shop: []
+    cocfr.clash_birthday: []
     meal-planner.meal_planner_api: []
     keycloak.keycloak: []
 
@@ -26,6 +27,7 @@ spec:
     frat_shop: fraternity.frat_shop
     meal_planner_api: meal-planner.meal_planner_api
     keycloak_db: keycloak.keycloak
+    clash_birthday: cocfr.clash_birthday
 
   postgresql:
     version: "13"
