@@ -33,7 +33,7 @@ spec:
   project: default
   source:
     repoURL: registry-1.docker.io/bitnamicharts
-    targetRevision: 16.0.10
+    targetRevision: 17.0.3
     chart: minio
     helm:
       values: |
