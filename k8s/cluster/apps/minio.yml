@@ -33,7 +33,7 @@ spec:
   project: default
   source:
     repoURL: registry-1.docker.io/bitnamicharts
-    targetRevision: 16.0.10
+    targetRevision: 17.0.3
     chart: minio
     helm:
       values: |
@@ -54,17 +54,8 @@ spec:
                 key: root-password
         auth:
           existingSecret: "minio-secrets"
+        # Configuration pour l'API MinIO (S3)
         ingress:
-          enabled: true
-          ingressClassName: "public"
-          hostname: s3.gastbob40.ovh
-          pathType: Prefix
-          annotations:
-            cert-manager.io/cluster-issuer: default-issuer
-            cert-manager.io/revision-history-limit: "1"
-            nginx.ingress.kubernetes.io/proxy-body-size: "4G"
-          tls: true
-        apiIngress:
           enabled: true
           ingressClassName: "public"
           hostname: api.s3.gastbob40.ovh
@@ -74,6 +65,19 @@ spec:
             cert-manager.io/revision-history-limit: "1"
             nginx.ingress.kubernetes.io/proxy-body-size: "4G"
           tls: true
+        # Configuration pour la Console UI (séparée depuis v17.0.0)
+        console:
+          enabled: true
+          ingress:
+            enabled: true
+            ingressClassName: "public"
+            hostname: s3.gastbob40.ovh
+            pathType: Prefix
+            annotations:
+              cert-manager.io/cluster-issuer: default-issuer
+              cert-manager.io/revision-history-limit: "1"
+              nginx.ingress.kubernetes.io/proxy-body-size: "4G"
+            tls: true
         persistence:
           size: 50Gi
         nodeSelector:
