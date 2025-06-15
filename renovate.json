@@ -4,15 +4,19 @@
     "config:recommended"
   ],
   "argocd": {
-    "fileMatch": [
-      "^k8s/cluster/apps/.+\\.ya?ml$"
+    "managerFilePatterns": [
+      "/^k8s/cluster/apps/.+\\.ya?ml$/"
     ]
   },
   "kubernetes": {
-    "fileMatch": ["^k8s/.+\\.ya?ml$"]
+    "managerFilePatterns": [
+      "/^k8s/.+\\.ya?ml$/"
+    ]
   },
   "kustomize": {
-    "fileMatch": ["kustomization\\.ya?ml$"]
+    "managerFilePatterns": [
+      "/kustomization\\.ya?ml$/"
+    ]
   },
   "commitMessage": "k8s: apps: upgrade {{depName}} to {{newVersion}}"
 }
