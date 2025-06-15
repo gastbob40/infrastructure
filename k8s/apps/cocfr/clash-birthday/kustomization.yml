@@ -2,7 +2,7 @@
 kind: Kustomization
 
 commonLabels:
-  component: cocfr
+  component: cocfc-clash-birthday
 
 configMapGenerator:
   - name: common-config

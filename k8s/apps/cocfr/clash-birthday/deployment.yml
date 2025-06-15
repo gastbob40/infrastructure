@@ -2,17 +2,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: cocfr
+  name: cocfc-clash-birthday
 spec:
   replicas: 1
   revisionHistoryLimit: 0
   selector:
     matchLabels:
-      component: cocfr
+      component: cocfc-clash-birthday
   template:
     metadata:
       labels:
-        component: cocfr
+        component: cocfc-clash-birthday
     spec:
       containers:
         - name: app
@@ -40,27 +40,27 @@ spec:
             - name: DISCORD_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: cocfr-clash-birthday
+                  name: cocfr-clash-birthday-secrets
                   key: DISCORD_TOKEN
             - name: BIRTHDAY_CHANNEL_ID
               valueFrom:
                 secretKeyRef:
-                  name: cocfr-clash-birthday
+                  name: cocfr-clash-birthday-secrets
                   key: BIRTHDAY_CHANNEL_ID
             - name: BIRTHDAY_ADMIN_IDS
               valueFrom:
                 secretKeyRef:
-                  name: cocfr-clash-birthday
+                  name: cocfr-clash-birthday-secrets
                   key: BIRTHDAY_ADMIN_IDS
             - name: BIRTHDAY_GUILD_ID
               valueFrom:
                 secretKeyRef:
-                  name: cocfr-clash-birthday
+                  name: cocfr-clash-birthday-secrets
                   key: BIRTHDAY_GUILD_ID
             - name: BIRTHDAY_ROLE_ID
               valueFrom:
                 secretKeyRef:
-                  name: cocfr-clash-birthday
+                  name: cocfr-clash-birthday-secrets
                   key: BIRTHDAY_ROLE_ID
           envFrom:
             - configMapRef:
