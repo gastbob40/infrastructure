@@ -7,7 +7,6 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: default-issuer
     cert-manager.io/revision-history-limit: "1"
-    acme.cert-manager.io/http01-edit-in-place: "true"
 
 spec:
   ingressClassName: public
