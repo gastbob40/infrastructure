@@ -18,10 +18,14 @@ spec:
     helm:
       values: |
         controller:
-          # kind: DaemonSet
-        
-          nodeSelector:
-            node-role.kubernetes.io/master: "true"
+          kind: DaemonSet
+          
+          nodeSelector: {}
+          
+          tolerations:
+            - key: "node-role.kubernetes.io/master"
+              operator: "Exists"
+              effect: "NoSchedule"
         
           ingressClass: public
           ingressClassResource:
