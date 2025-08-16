@@ -69,23 +69,3 @@ spec:
               protocol: TCP
       securityContext:
         fsGroup: 2000
-
-      nodeSelector:
-        node-role.kubernetes.io/master: "true"
-
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                    - key: app
-                      operator: In
-                      values:
-                        - frat-shop
-                    - key: component
-                      operator: In
-                      values:
-                        - frat-shop
-                topologyKey: kubernetes.io/hostname
