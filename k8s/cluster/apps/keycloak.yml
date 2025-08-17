@@ -24,6 +24,9 @@ spec:
     targetRevision: 25.1.0
     helm:
       values: |
+        production: true
+        proxyHeaders: xforwarded
+        revisionHistoryLimitCount: 1
         postgresql:
           enabled: false
         externalDatabase:
@@ -37,7 +40,7 @@ spec:
         ingress:
           enabled: true
           ingressClassName: "public"
-          hostname: auth.gastbob40.ovh
+          hostname: old-auth.gastbob40.ovh
           pathType: Prefix
           annotations:
             cert-manager.io/cluster-issuer: default-issuer
