@@ -13,10 +13,12 @@ spec:
     chart: redpanda
     helm:
       values: |
-        nodeSelector:
-          node-role.kubernetes.io/master: "true"
         statefulset:
           replicas: 1
+        podTemplate:
+          spec:
+            nodeSelector:
+              node-role.kubernetes.io/master: "true"
         listeners:
           kafka:
             tls:
