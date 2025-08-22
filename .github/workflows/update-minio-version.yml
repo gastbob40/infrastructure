@@ -53,9 +53,6 @@ jobs:
       run: |
         LATEST_TAG="${{ steps.latest-version.outputs.latest_tag }}"
         
-        # Backup du fichier original
-        cp k8s/cluster/apps/minio-community.yml k8s/cluster/apps/minio-community.yml.bak
-        
         # Mise à jour de la version dans le fichier YAML
         sed -i "s|tag: \".*\"|tag: \"$LATEST_TAG\"|g" k8s/cluster/apps/minio-community.yml
         
@@ -69,13 +66,14 @@ jobs:
         echo "Changes made:"
         git diff k8s/cluster/apps/minio-community.yml
 
+
     - name: Create Pull Request
       if: steps.version-check.outputs.needs_update == 'true'
       uses: peter-evans/create-pull-request@v7
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        commit-message: "🚀 Update MinIO to ${{ steps.latest-version.outputs.latest_tag }}"
-        title: "🚀 Auto-update: MinIO ${{ steps.version-check.outputs.version_change }}"
+        commit-message: "k8s: cluster: minio: bump to ${{ steps.latest-version.outputs.latest_tag }}"
+        title: "k8s: cluster: minio: bump to ${{ steps.latest-version.outputs.latest_tag }}"
         body: |
           ## 🚀 Automatic MinIO Version Update
           
