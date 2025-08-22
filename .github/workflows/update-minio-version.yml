@@ -1,0 +1,113 @@
+name: Update MinIO Version
+
+on:
+  schedule:
+    # Exécute tous les jours à 2h du matin UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Permet l'exécution manuelle
+
+jobs:
+  check-and-update-minio:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v5
+
+    - name: Setup jq for JSON parsing
+      run: sudo apt-get update && sudo apt-get install -y jq
+
+    - name: Get current MinIO version from chart
+      id: current-version
+      run: |
+        CURRENT_TAG=$(grep -A 2 'image:' k8s/cluster/apps/minio-community.yml | grep 'tag:' | sed 's/.*tag: *"\(.*\)"/\1/')
+        echo "current_tag=$CURRENT_TAG" >> $GITHUB_OUTPUT
+        echo "Current MinIO version: $CURRENT_TAG"
+
+    - name: Get latest MinIO release
+      id: latest-version
+      run: |
+        LATEST_TAG=$(curl -s https://api.github.com/repos/minio/minio/releases/latest | jq -r '.tag_name')
+        echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+        echo "Latest MinIO version: $LATEST_TAG"
+
+    - name: Compare versions and update if needed
+      id: version-check
+      run: |
+        CURRENT="${{ steps.current-version.outputs.current_tag }}"
+        LATEST="${{ steps.latest-version.outputs.latest_tag }}"
+        
+        echo "Comparing: $CURRENT vs $LATEST"
+        
+        if [ "$CURRENT" != "$LATEST" ]; then
+          echo "New version available: $LATEST"
+          echo "needs_update=true" >> $GITHUB_OUTPUT
+          echo "version_change=$CURRENT → $LATEST" >> $GITHUB_OUTPUT
+        else
+          echo "Already up to date"
+          echo "needs_update=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Update MinIO version in chart
+      if: steps.version-check.outputs.needs_update == 'true'
+      run: |
+        LATEST_TAG="${{ steps.latest-version.outputs.latest_tag }}"
+        
+        # Backup du fichier original
+        cp k8s/cluster/apps/minio-community.yml k8s/cluster/apps/minio-community.yml.bak
+        
+        # Mise à jour de la version dans le fichier YAML
+        sed -i "s|tag: \".*\"|tag: \"$LATEST_TAG\"|g" k8s/cluster/apps/minio-community.yml
+        
+        # Vérification que le changement a été appliqué
+        echo "Updated file content:"
+        grep -A 2 'image:' k8s/cluster/apps/minio-community.yml | grep 'tag:'
+
+    - name: Verify changes
+      if: steps.version-check.outputs.needs_update == 'true'
+      run: |
+        echo "Changes made:"
+        git diff k8s/cluster/apps/minio-community.yml
+
+    - name: Create Pull Request
+      if: steps.version-check.outputs.needs_update == 'true'
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: "🚀 Update MinIO to ${{ steps.latest-version.outputs.latest_tag }}"
+        title: "🚀 Auto-update: MinIO ${{ steps.version-check.outputs.version_change }}"
+        body: |
+          ## 🚀 Automatic MinIO Version Update
+          
+          **Previous version:** `${{ steps.current-version.outputs.current_tag }}`
+          **New version:** `${{ steps.latest-version.outputs.latest_tag }}`
+          
+          ### 📋 Changes
+          - Updated MinIO image tag in `k8s/cluster/apps/minio-community.yml`
+          - This update was automatically detected and applied
+          
+          ### 🔍 Release Notes
+          Check the [MinIO releases page](https://github.com/minio/minio/releases/tag/${{ steps.latest-version.outputs.latest_tag }}) for details.
+          
+          ### ✅ Next Steps
+          1. Review this PR for any breaking changes
+          2. Test in a development environment if needed
+          3. Merge to deploy the update via ArgoCD
+          
+          ---
+          🤖 *This PR was created automatically by GitHub Actions*
+        branch: auto-update/minio-${{ steps.latest-version.outputs.latest_tag }}
+        delete-branch: true
+        draft: false
+        labels: |
+          automated
+          minio
+          update
+
+    - name: Summary
+      run: |
+        if [ "${{ steps.version-check.outputs.needs_update }}" == "true" ]; then
+          echo "✅ Created PR for MinIO update: ${{ steps.version-check.outputs.version_change }}"
+        else
+          echo "ℹ️ No update needed - MinIO is already up to date"
+        fi

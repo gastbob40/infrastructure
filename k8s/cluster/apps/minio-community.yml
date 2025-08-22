@@ -1,0 +1,106 @@
+---
+apiVersion: ricoberger.de/v1alpha1
+kind: VaultSecret
+metadata:
+  name: minio-community-secrets
+  namespace: minio-community
+spec:
+  path: k8s/minio
+  keys:
+    - rootUser
+    - rootPassword
+  type: Opaque
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minio-community
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    app: minio-community
+spec:
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+  destination:
+    name: in-cluster
+    namespace: minio-community
+  project: default
+  source:
+    repoURL: https://charts.min.io/
+    targetRevision: 5.4.0
+    chart: minio
+    helm:
+      values: |
+        mode: standalone
+        
+        # Force latest MinIO version
+        image:
+          repository: quay.io/minio/minio
+          tag: "RELEASE.2025-07-23T15-54-02Z"
+        
+        existingSecret: "minio-community-secrets"
+        
+        environment:
+          MINIO_BROWSER_REDIRECT_URL: "https://s3.gastbob40.ovh"
+          MINIO_SERVER_URL: "https://api.s3.gastbob40.ovh"
+        
+        persistence:
+          enabled: true
+          storageClass: ""
+          accessMode: ReadWriteOnce
+          size: 50Gi
+        
+        service:
+          type: ClusterIP
+          port: "9000"
+        
+        consoleService:
+          type: ClusterIP
+          port: "9001"
+        
+        ingress:
+          enabled: true
+          ingressClassName: "public"
+          annotations:
+            cert-manager.io/cluster-issuer: default-issuer
+            cert-manager.io/revision-history-limit: "1"
+            nginx.ingress.kubernetes.io/proxy-body-size: "4G"
+          hosts:
+            - api.s3.gastbob40.ovh
+          tls:
+            - secretName: minio-api-tls
+              hosts:
+                - api.s3.gastbob40.ovh
+        
+        consoleIngress:
+          enabled: true
+          ingressClassName: "public"
+          annotations:
+            cert-manager.io/cluster-issuer: default-issuer
+            cert-manager.io/revision-history-limit: "1"
+            nginx.ingress.kubernetes.io/proxy-body-size: "4G"
+          hosts:
+            - s3.gastbob40.ovh
+          tls:
+            - secretName: minio-console-tls
+              hosts:
+                - s3.gastbob40.ovh
+        
+        # Node selector pour placer sur le master
+        nodeSelector:
+          node-role.kubernetes.io/master: "true"
+        
+        # Resources
+        resources:
+          requests:
+            memory: 256Mi
+            cpu: 250m
+          limits:
+            memory: 2Gi
+            cpu: 1000m
