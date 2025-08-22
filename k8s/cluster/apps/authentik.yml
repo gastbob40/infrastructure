@@ -1,0 +1,162 @@
+---
+apiVersion: ricoberger.de/v1alpha1
+kind: VaultSecret
+metadata:
+  name: authentik-secrets
+  namespace: authentik
+spec:
+  path: k8s/authentik
+  keys:
+    - secret_key
+    - bootstrap_password
+  type: Opaque
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: authentik
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    app: authentik
+spec:
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
+  destination:
+    name: in-cluster
+    namespace: authentik
+  project: default
+  source:
+    chart: authentik
+    repoURL: https://charts.goauthentik.io
+    targetRevision: 2025.8.0
+    helm:
+      values: |
+        # Global configuration
+        global:
+          fullnameOverride: "authentik"
+
+        # Authentik server configuration
+        authentik:
+          bootstrap_email: "gastbob40@gmail.com"
+          bootstrap_password: "admin123"
+          # Database configuration
+          postgresql:
+            host: "infra-main-cluster.postgres.svc.cluster.local"
+            port: 5432
+            name: "authentik_db"
+          # Redis configuration
+          redis:
+            host: "authentik-redis-master"
+            port: 6379
+          # External URL
+          url: "https://auth.gastbob40.ovh"
+
+        # Server deployment configuration
+        server:
+          name: server
+          replicas: 1
+          # Environment variables from secrets
+          env:
+            - name: AUTHENTIK_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-secrets
+                  key: secret_key
+            - name: AUTHENTIK_POSTGRESQL__USER
+              valueFrom:
+                secretKeyRef:
+                  name: authentik.authentik.infra-main-cluster.credentials.postgresql.acid.zalan.do
+                  key: username
+            - name: AUTHENTIK_POSTGRESQL__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: authentik.authentik.infra-main-cluster.credentials.postgresql.acid.zalan.do
+                  key: password
+          # Ingress configuration
+          ingress:
+            enabled: true
+            ingressClassName: "public"
+            annotations:
+              cert-manager.io/cluster-issuer: "default-issuer"
+              cert-manager.io/revision-history-limit: "1"
+              nginx.ingress.kubernetes.io/proxy-body-size: "4G"
+              nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+              nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+            hosts:
+              - auth.gastbob40.ovh
+            tls:
+              - secretName: authentik-tls
+                hosts:
+                  - auth.gastbob40.ovh
+          # Probes
+          livenessProbe:
+            httpGet:
+              path: /-/health/live/
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /-/health/ready/
+              port: http
+            initialDelaySeconds: 120
+            periodSeconds: 15
+            timeoutSeconds: 10
+            failureThreshold: 3
+
+        # Worker deployment configuration  
+        worker:
+          name: worker
+          replicas: 1
+          # Environment variables from secrets
+          env:
+            - name: AUTHENTIK_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: authentik-secrets
+                  key: secret_key
+            - name: AUTHENTIK_POSTGRESQL__USER
+              valueFrom:
+                secretKeyRef:
+                  name: authentik.authentik.infra-main-cluster.credentials.postgresql.acid.zalan.do
+                  key: username
+            - name: AUTHENTIK_POSTGRESQL__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: authentik.authentik.infra-main-cluster.credentials.postgresql.acid.zalan.do
+                  key: password
+
+        # PostgreSQL configuration (external)
+        postgresql:
+          enabled: false
+
+        # Redis configuration (bundled)
+        redis:
+          enabled: true
+          architecture: standalone
+          master:
+            persistence:
+              enabled: true
+              size: 1Gi
+            resources:
+              limits:
+                cpu: 250m
+                memory: 256Mi
+              requests:
+                cpu: 50m
+                memory: 128Mi
+          auth:
+            enabled: false
+
+        # Service Monitor for Prometheus
+        serviceMonitor:
+          enabled: false

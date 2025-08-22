@@ -19,6 +19,7 @@ spec:
     cocfr.clash_birthday: []
     meal-planner.meal_planner_api: []
     keycloak.keycloak: []
+    authentik.authentik: []
 
   # databases: name -> owner
   databases:
@@ -28,6 +29,7 @@ spec:
     meal_planner_api: meal-planner.meal_planner_api
     keycloak_db: keycloak.keycloak
     clash_birthday: cocfr.clash_birthday
+    authentik_db: authentik.authentik
 
   postgresql:
     version: "13"

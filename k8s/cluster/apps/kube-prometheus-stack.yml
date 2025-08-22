@@ -111,21 +111,24 @@ spec:
 
             auth.generic_oauth:
               enabled: true
-              name: "Keycloak SSO"
+              name: "Authentik SSO"
               allow_sign_up: true
         
               client_id: $__file{/etc/secrets/auth_oidc/client_id}
               client_secret: $__file{/etc/secrets/auth_oidc/client_secret}
-              scopes: openid
-              login_attribute_path: email
-              name_attribute_path: name
+              scopes: openid email profile
               
-              role_attribute_path: contains(roles[*], 'grafana-admin') && 'GrafanaAdmin' || contains(roles[*], 'admin') && 'Admin' || contains(roles[*], 'editor') && 'Editor' || 'Viewer'
+              auth_url: https://auth.gastbob40.ovh/application/o/authorize/
+              token_url: https://auth.gastbob40.ovh/application/o/token/
+              api_url: https://auth.gastbob40.ovh/application/o/userinfo/
+              
+              email_attribute_path: email
+              login_attribute_path: preferred_username
+              name_attribute_path: name
+              groups_attribute_path: groups
+              
+              role_attribute_path: contains(groups[*], 'grafana-admin') && 'GrafanaAdmin' || contains(groups[*], 'admin') && 'Admin' || contains(groups[*], 'editor') && 'Editor' || 'Viewer'
               allow_assign_grafana_admin: true
-        
-              auth_url: https://auth.gastbob40.ovh/realms/infra/protocol/openid-connect/auth
-              token_url: https://auth.gastbob40.ovh/realms/infra/protocol/openid-connect/token
-              api_url: https://auth.gastbob40.ovh/realms/infra/protocol/openid-connect/userinfo
           
           extraSecretMounts:
             - name: grafana-auth-oidc
