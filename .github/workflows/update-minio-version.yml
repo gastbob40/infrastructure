@@ -74,8 +74,8 @@ jobs:
       uses: peter-evans/create-pull-request@v7
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        commit-message: "🚀 Update MinIO to ${{ steps.latest-version.outputs.latest_tag }}"
-        title: "🚀 Auto-update: MinIO ${{ steps.version-check.outputs.version_change }}"
+        commit-message: "k8s: cluster: minio: bump to ${{ steps.latest-version.outputs.latest_tag }}"
+        title: "k8s: cluster: minio: bump to ${{ steps.latest-version.outputs.latest_tag }}"
         body: |
           ## 🚀 Automatic MinIO Version Update
           
