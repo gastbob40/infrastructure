@@ -1,0 +1,89 @@
+---
+apiVersion: ricoberger.de/v1alpha1
+kind: VaultSecret
+metadata:
+  name: oauth2-proxy-secrets
+  namespace: oauth2-proxy
+spec:
+  path: k8s/oauth2-proxy
+  keys:
+    - client-id
+    - client-secret
+    - cookie-secret
+  type: Opaque
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: oauth2-proxy
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://oauth2-proxy.github.io/manifests
+    targetRevision: 7.8.1
+    chart: oauth2-proxy
+    helm:
+      values: |
+        replicaCount: 1
+
+        # Configuration OAuth2-Proxy
+        config:
+          existingSecret: oauth2-proxy-secrets
+          configFile: |-
+            email_domains = [ "*" ]
+            provider = "oidc"
+            oidc_issuer_url = "https://auth.gastbob40.ovh/application/o/oauth2-proxy/"
+            scope = "openid profile email"
+            redirect_url = "https://auth-proxy.gastbob40.ovh/oauth2/callback"
+            cookie_domains = [ ".gastbob40.ovh" ]
+            cookie_secure = true
+            cookie_httponly = true
+            cookie_samesite = "lax"
+            whitelist_domains = [ ".gastbob40.ovh" ]
+        
+        # Service et Ingress
+        service:
+          type: ClusterIP
+          portNumber: 4180
+        
+        ingress:
+          enabled: true
+          className: "public"
+          annotations:
+            cert-manager.io/cluster-issuer: "default-issuer"
+            cert-manager.io/revision-history-limit: "1"
+          hosts:
+            - auth-proxy.gastbob40.ovh
+          tls:
+            - secretName: oauth2-proxy-tls
+              hosts:
+                - auth-proxy.gastbob40.ovh
+
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+
+        nodeSelector:
+          node-role.kubernetes.io/master: "true"
+
+        tolerations:
+          - key: "node-role.kubernetes.io/master"
+            operator: "Exists"
+            effect: "NoSchedule"
+
+  destination:
+    namespace: oauth2-proxy
+    name: in-cluster
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
