@@ -39,6 +39,9 @@ spec:
             real-ip-recursive: "true"
             compute-full-forwarded-for: "true"
             use-forwarded-headers: "true"
-            set-real-ip-from: "0.0.0.0/0"
+            set-real-ip-from: "10.42.0.0/16,10.43.0.0/16,100.81.32.65/32,100.76.181.28/32,23.88.98.223/32"
+            enable-real-ip: "true"
+            proxy-add-original-uri-header: "true"
           service:
+            type: LoadBalancer
             externalTrafficPolicy: Local
