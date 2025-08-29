@@ -55,10 +55,10 @@ spec:
               nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
               cert-manager.io/cluster-issuer: default-issuer
             hosts:
-              - host: vault.k8s.gastbob40.ovh
+              - host: vault.k8s.gastbob40.com
             tls:
               - hosts:
-                  - vault.k8s.gastbob40.ovh
+                  - vault.k8s.gastbob40.com
                 secretName: vault-tls
   destination:
     namespace: vault

@@ -12,10 +12,10 @@ metadata:
 spec:
   ingressClassName: public
   tls:
-    - hosts: ["argocd.k8s.gastbob40.ovh"]
+    - hosts: ["argocd.k8s.gastbob40.com"]
       secretName: argocd-server-ingress-tls
   rules:
-    - host: argocd.k8s.gastbob40.ovh
+    - host: argocd.k8s.gastbob40.com
       http:
         paths:
           - path: /
