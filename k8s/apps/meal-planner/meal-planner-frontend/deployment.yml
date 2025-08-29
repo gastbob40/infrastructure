@@ -12,8 +12,12 @@ spec:
   template:
     metadata:
       labels:
-        component: meal-planner-api
+        component: meal-planner-frontend
     spec:
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
       containers:
         - name: app
           image: gastbob40/meal-planner-frontend

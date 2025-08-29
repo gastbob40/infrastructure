@@ -18,7 +18,7 @@ spec:
     fraternity.frat_shop: []
     cocfr.clash_birthday: []
     meal-planner.meal_planner_api: []
-    authentic.authentik: []
+    authentik.authentik: []
 
   # databases: name -> owner
   databases:

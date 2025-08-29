@@ -38,8 +38,8 @@ spec:
             provider = "oidc"
             oidc_issuer_url = "https://auth.gastbob40.com/application/o/oauth2-proxy/"
             scope = "openid profile email"
-            redirect_url = "https://auth-proxy.gastbob40.com/oauth2/callback"
-            cookie_domains = [ ".gastbob40.com" ]
+            redirect_url = "https://auth-proxy.k8s.gastbob40.com/oauth2/callback"
+            cookie_domains = [ ".gastbob40.com", ".k8s.gastbob40.com" ]
             cookie_secure = true
             cookie_httponly = true
             cookie_samesite = "lax"
@@ -57,11 +57,11 @@ spec:
             cert-manager.io/cluster-issuer: "default-issuer"
             cert-manager.io/revision-history-limit: "1"
           hosts:
-            - auth-proxy.gastbob40.com
+            - auth-proxy.k8s.gastbob40.com
           tls:
             - secretName: oauth2-proxy-tls
               hosts:
-                - auth-proxy.gastbob40.com
+                - auth-proxy.k8s.gastbob40.com
 
         resources:
           limits:

@@ -7,7 +7,7 @@ metadata:
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
-    app: minio
+    app: flaresolverr
 spec:
   syncPolicy:
     syncOptions:
