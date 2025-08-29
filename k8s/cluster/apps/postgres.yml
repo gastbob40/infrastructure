@@ -11,7 +11,7 @@ spec:
   source:
     path: k8s/cluster/postgres
     repoURL: https://github.com/gastbob40/infrastructure.git
-    targetRevision: old
+    
   destination:
     namespace: postgres
     name: in-cluster

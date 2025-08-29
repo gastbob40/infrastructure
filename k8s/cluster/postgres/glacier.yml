@@ -30,7 +30,7 @@ spec:
                       name: minio-secrets
                       key: root-password
                 - name: AWS_ENDPOINT_S3_PRIVATE
-                  value: "https://api.s3.gastbob40.ovh"
+                  value: "https://api.s3.gastbob40.com"
 
                 # Secret for AWS Glacier
                 - name: AWS_ACCESS_KEY_ID_GLACIER

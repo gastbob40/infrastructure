@@ -47,8 +47,8 @@ spec:
         existingSecret: "minio-community-secrets"
         
         environment:
-          MINIO_BROWSER_REDIRECT_URL: "https://s3.gastbob40.ovh"
-          MINIO_SERVER_URL: "https://api.s3.gastbob40.ovh"
+          MINIO_BROWSER_REDIRECT_URL: "https://s3.gastbob40.com"
+          MINIO_SERVER_URL: "https://api.s3.gastbob40.com"
         
         persistence:
           enabled: true
@@ -72,11 +72,11 @@ spec:
             cert-manager.io/revision-history-limit: "1"
             nginx.ingress.kubernetes.io/proxy-body-size: "4G"
           hosts:
-            - api.s3.gastbob40.ovh
+            - api.s3.gastbob40.com
           tls:
             - secretName: minio-api-tls
               hosts:
-                - api.s3.gastbob40.ovh
+                - api.s3.gastbob40.com
         
         consoleIngress:
           enabled: true
@@ -86,11 +86,11 @@ spec:
             cert-manager.io/revision-history-limit: "1"
             nginx.ingress.kubernetes.io/proxy-body-size: "4G"
           hosts:
-            - s3.gastbob40.ovh
+            - s3.gastbob40.com
           tls:
             - secretName: minio-console-tls
               hosts:
-                - s3.gastbob40.ovh
+                - s3.gastbob40.com
         
         # Node selector pour placer sur le master
         nodeSelector:

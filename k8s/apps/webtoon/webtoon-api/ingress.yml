@@ -15,7 +15,7 @@ metadata:
 spec:
   ingressClassName: public
   rules:
-    - host: "api.webtoon.gastbob40.ovh"
+    - host: "api.webtoon.gastbob40.com"
       http:
         paths:
           - path: /
@@ -27,6 +27,6 @@ spec:
                   number: 8000
   tls:
     - hosts:
-        - "api.webtoon.gastbob40.ovh"
+        - "api.webtoon.gastbob40.com"
       secretName: "webtoon-api-ingress-tls"
 

@@ -96,14 +96,14 @@ spec:
               nginx.ingress.kubernetes.io/proxy-body-size: "4G"
         
             hosts:
-              - grafana.gastbob40.ovh
+              - grafana.gastbob40.com
             tls:
               - secretName: grafana-tls-secrets
                 hosts:
-                - grafana.gastbob40.ovh
+                - grafana.gastbob40.com
           grafana.ini:
             server:
-              root_url: https://grafana.gastbob40.ovh
+              root_url: https://grafana.gastbob40.com
             auth:
               oauth_auto_login: false
               disable_login_form: true
@@ -118,9 +118,9 @@ spec:
               client_secret: $__file{/etc/secrets/auth_oidc/client_secret}
               scopes: openid email profile
               
-              auth_url: https://auth.gastbob40.ovh/application/o/authorize/
-              token_url: https://auth.gastbob40.ovh/application/o/token/
-              api_url: https://auth.gastbob40.ovh/application/o/userinfo/
+              auth_url: https://auth.gastbob40.com/application/o/authorize/
+              token_url: https://auth.gastbob40.com/application/o/token/
+              api_url: https://auth.gastbob40.com/application/o/userinfo/
               
               email_attribute_path: email
               login_attribute_path: preferred_username

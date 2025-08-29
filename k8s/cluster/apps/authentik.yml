@@ -56,7 +56,7 @@ spec:
             host: "authentik-redis-master"
             port: 6379
           # External URL
-          url: "https://auth.gastbob40.ovh"
+          url: "https://auth.gastbob40.com"
 
         # Server deployment configuration
         server:
@@ -90,11 +90,11 @@ spec:
               nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
               nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
             hosts:
-              - auth.gastbob40.ovh
+              - auth.gastbob40.com
             tls:
               - secretName: authentik-tls
                 hosts:
-                  - auth.gastbob40.ovh
+                  - auth.gastbob40.com
           # Probes
           livenessProbe:
             httpGet:

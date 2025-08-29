@@ -47,13 +47,13 @@ metadata:
     cert-manager.io/cluster-issuer: default-issuer
     cert-manager.io/revision-history-limit: "1"
     nginx.ingress.kubernetes.io/auth-url: "http://oauth2-proxy.oauth2-proxy.svc.cluster.local:4180/oauth2/auth"
-    nginx.ingress.kubernetes.io/auth-signin: "https://auth-proxy.gastbob40.ovh/oauth2/start?rd=$scheme://$http_host$request_uri"
+    nginx.ingress.kubernetes.io/auth-signin: "https://auth-proxy.gastbob40.com/oauth2/start?rd=$scheme://$http_host$request_uri"
     nginx.ingress.kubernetes.io/auth-response-headers: "X-Auth-Request-User, X-Auth-Request-Email"
 
 spec:
   ingressClassName: public
   rules:
-    - host: "kafka-console.gastbob40.ovh"
+    - host: "kafka-console.gastbob40.com"
       http:
         paths:
           - path: /
@@ -65,5 +65,5 @@ spec:
                   number: 8080
   tls:
     - hosts:
-        - "kafka-console.gastbob40.ovh"
+        - "kafka-console.gastbob40.com"
       secretName: "redpanda-console-tls"

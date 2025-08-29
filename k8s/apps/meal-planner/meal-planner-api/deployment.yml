@@ -48,7 +48,7 @@ spec:
                   name: minio-secrets
                   key: root-password
             - name: MINIO_URL
-              value: https://api.s3.gastbob40.ovh
+              value: https://api.s3.gastbob40.com
             - name: HELLOFRESH_USERNAME
               valueFrom:
                 secretKeyRef:

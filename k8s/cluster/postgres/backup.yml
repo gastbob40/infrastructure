@@ -37,7 +37,7 @@ spec:
                       name: minio-secrets
                       key: root-password
                 - name: AWS_ENDPOINT_URL
-                  value: "https://api.s3.gastbob40.ovh"
+                  value: "https://api.s3.gastbob40.com"
                 - name: AWS_REGION
                   value: "us-east-1"
                 - name: S3_BUCKET

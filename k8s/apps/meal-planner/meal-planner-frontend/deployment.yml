@@ -24,9 +24,9 @@ spec:
                 fieldRef:
                   fieldPath: metadata.uid
             - name: NEXTAUTH_URL
-              value: https://meal-planner.gastbob40.ovh
+              value: https://meal-planner.gastbob40.com
             - name: NEXT_PUBLIC_MEAL_PLANNER_API
-              value: https://api.meal-planner.gastbob40.ovh
+              value: https://api.meal-planner.gastbob40.com
             - name: NEXTAUTH_SECRET
               valueFrom:
                 secretKeyRef:
