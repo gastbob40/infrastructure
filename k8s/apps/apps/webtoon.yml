@@ -10,7 +10,7 @@ spec:
   source:
     path: k8s/apps/webtoon
     repoURL: https://github.com/gastbob40/infrastructure.git
-    targetRevision: HEAD
+    targetRevision: old
   destination:
     name: in-cluster
     namespace: webtoon

@@ -10,7 +10,7 @@ spec:
   source:
     path: k8s/apps/cocfr
     repoURL: https://github.com/gastbob40/infrastructure.git
-    targetRevision: HEAD
+    targetRevision: old
   destination:
     name: in-cluster
     namespace: cocfr

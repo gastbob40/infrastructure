@@ -10,7 +10,7 @@ spec:
   source:
     path: k8s/apps/meal-planner
     repoURL: https://github.com/gastbob40/infrastructure.git
-    targetRevision: HEAD
+    targetRevision: old
   destination:
     name: in-cluster
     namespace: meal-planner

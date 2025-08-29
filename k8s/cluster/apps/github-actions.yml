@@ -8,7 +8,7 @@ spec:
   source:
     path: k8s/cluster/github-actions
     repoURL: https://github.com/gastbob40/infrastructure.git
-    targetRevision: HEAD
+    targetRevision: old
   destination:
     namespace: github-actions
     name: in-cluster
