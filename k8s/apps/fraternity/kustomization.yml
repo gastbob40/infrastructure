@@ -2,17 +2,12 @@
 kind: Kustomization
 namespace: fraternity
 
-commonLabels:
-  app: fleet
-
 resources:
   - namespace.yml
-  - frat-dump
   - frat-logs
   - frat-shop
 
-images:
-  - name: systemfraternity/frat_dump
-    newTag: latest
-  - name: systemfraternity/frat_dashboard
-    newTag: latest
+configMapGenerator:
+  - name: common-config
+    literals:
+      - DB_HOST=infra-main-cluster.postgres.svc.cluster.local
