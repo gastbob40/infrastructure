@@ -8,7 +8,7 @@ spec:
   source:
     path: k8s/cluster/argocd-deployment
     repoURL: https://github.com/gastbob40/infrastructure.git
-    targetRevision: HEAD
+    targetRevision: old
   destination:
     namespace: argocd-deployment
     name: in-cluster
