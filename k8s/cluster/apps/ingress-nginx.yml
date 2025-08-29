@@ -15,7 +15,7 @@ spec:
   source:
     repoURL: https://kubernetes.github.io/ingress-nginx
     chart: ingress-nginx
-    targetRevision: 4.13.1
+    targetRevision: 4.13.2
     helm:
       values: |
         controller:
@@ -44,6 +44,9 @@ spec:
             name: public
             default: true
         
+          extraArgs:
+            profiler-port: 0
+          
           config:
             allow-snippet-annotations: "true"
             real-ip-header: "X-Forwarded-For"
