@@ -21,8 +21,19 @@ spec:
                 name: "frat-shop"
                 port:
                   number: 80
+    - host: "shop.fraternity.gastbob40.ovh"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: "frat-shop"
+                port:
+                  number: 80
 
   tls:
     - hosts:
         - "shop.fraternity.gastbob40.com"
+        - "shop.fraternity.gastbob40.ovh"
       secretName: "frat-shop-tls"

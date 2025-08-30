@@ -21,8 +21,19 @@ spec:
                 name: "frat-logs"
                 port:
                   number: 80
+    - host: "logs.fraternity.gastbob40.ovh"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: "frat-logs"
+                port:
+                  number: 80
   tls:
     - hosts:
         - "logs.fraternity.gastbob40.com"
+        - "logs.fraternity.gastbob40.ovh"
       secretName: "frat-logs-tls"
 

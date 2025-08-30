@@ -53,6 +53,10 @@ spec:
             hostPort: false
         grafana:
           revisionHistoryLimit: 0
+          dnsConfig:
+            options:
+              - name: ndots
+                value: "1"
           dashboardProviders:
             dashboardproviders.yaml:
               apiVersion: 1
