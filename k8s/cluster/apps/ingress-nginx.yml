@@ -44,6 +44,8 @@ spec:
             name: public
             default: true
         
+          terminationGracePeriodSeconds: 30
+          
           extraArgs:
             profiler-port: 0
           
