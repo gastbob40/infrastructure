@@ -9,7 +9,7 @@ metadata:
     cert-manager.io/revision-history-limit: "1"
 
 spec:
-  ingressClassName: public
+  ingressClassName: traefik
   rules:
     - host: "logs.fraternity.gastbob40.com"
       http:

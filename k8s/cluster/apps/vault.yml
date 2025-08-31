@@ -50,9 +50,9 @@ spec:
             path: "/v1/sys/health?standbyok=true&sealedcode=204&uninitcode=204"
           ingress:
             enabled: true
-            ingressClassName: public
+            ingressClassName: traefik
             annotations:
-              nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+              traefik.ingress.kubernetes.io/router.tls: "true"
               cert-manager.io/cluster-issuer: default-issuer
             hosts:
               - host: vault.k8s.gastbob40.com

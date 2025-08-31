@@ -6,11 +6,11 @@ metadata:
   # Allow antoine big oidc energy
   annotations:
     cert-manager.io/cluster-issuer: default-issuer
-    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     cert-manager.io/revision-history-limit: "1"
+    # Traefik - désactiver la vérification TLS backend
+    traefik.ingress.kubernetes.io/service.serversscheme: "http"
 spec:
-  ingressClassName: public
+  ingressClassName: traefik
   tls:
     - hosts: ["argocd.k8s.gastbob40.com"]
       secretName: argocd-server-ingress-tls

@@ -6,3 +6,9 @@ resources:
 
 patchesStrategicMerge:
   - argocd-deployment.yml
+
+patches:
+  - target:
+      kind: ConfigMap
+      name: argocd-cmd-params-cm
+    path: argocd-cmd-params-patch.yml

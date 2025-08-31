@@ -51,7 +51,7 @@ metadata:
     nginx.ingress.kubernetes.io/auth-response-headers: "X-Auth-Request-User, X-Auth-Request-Email"
 
 spec:
-  ingressClassName: public
+  ingressClassName: traefik
   rules:
     - host: "kafka-console.k8s.gastbob40.com"
       http:
