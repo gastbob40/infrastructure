@@ -92,7 +92,7 @@ spec:
             
           ingress:
             enabled: true
-            ingressClassName: traefik
+            ingressClassName: public
             pathType: Prefix
             annotations:
               cert-manager.io/cluster-issuer: default-issuer

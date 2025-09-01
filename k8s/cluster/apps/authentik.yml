@@ -82,7 +82,7 @@ spec:
           # Ingress configuration
           ingress:
             enabled: true
-            ingressClassName: "traefik"
+            ingressClassName: "public"
             annotations:
               cert-manager.io/cluster-issuer: "default-issuer"
               cert-manager.io/revision-history-limit: "1"
