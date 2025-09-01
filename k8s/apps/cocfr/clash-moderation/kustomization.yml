@@ -2,7 +2,7 @@
 kind: Kustomization
 
 commonLabels:
-  component: cocfc-clash-birthday
+  component: cocfc-clash-moderation
 
 resources:
   - deployment.yml

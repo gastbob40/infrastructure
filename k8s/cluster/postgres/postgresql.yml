@@ -17,6 +17,7 @@ spec:
     fraternity.frat_logs: []
     fraternity.frat_shop: []
     cocfr.clash_birthday: []
+    cocfr.clash_moderation: []
     meal-planner.meal_planner_api: []
     authentik.authentik: []
 
@@ -27,6 +28,7 @@ spec:
     frat_shop: fraternity.frat_shop
     meal_planner_api: meal-planner.meal_planner_api
     clash_birthday: cocfr.clash_birthday
+    clash_moderation: cocfr.clash_moderation
     authentik_db: authentik.authentik
 
   postgresql:

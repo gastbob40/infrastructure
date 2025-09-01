@@ -1,0 +1,75 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cocfc-clash-moderation
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      component: cocfc-clash-moderation
+  template:
+    metadata:
+      labels:
+        component: cocfc-clash-moderation
+    spec:
+      imagePullSecrets:
+        - name: ghcr-pull-secret
+      containers:
+        - name: app
+          image: ghcr.io/gastbob40/cocfr-moderation:latest
+          imagePullPolicy: Always
+          env:
+            - name: POD_METADATA_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: DATASOURCE_HOST
+              value: infra-main-cluster.postgres.svc.cluster.local
+            - name: POSTGRESQL_DATABASE
+              value: clash_moderation
+            - name: POSTGRESQL_PORT
+              value: "5432"
+            - name: POSTGRESQL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: cocfr.clash-moderation.infra-main-cluster.credentials.postgresql.acid.zalan.do
+                  key: username
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cocfr.clash-moderation.infra-main-cluster.credentials.postgresql.acid.zalan.do
+                  key: password
+            - name: COCFR_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cocfr-moderation-secrets
+                  key: COCFR_BOT_TOKEN
+            - name: COCFR_GUILD_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cocfr-moderation-secrets
+                  key: COCFR_GUILD_ID
+            - name: COCFR_LOGS_MODERATION
+              valueFrom:
+                secretKeyRef:
+                  name: cocfr-moderation-secrets
+                  key: COCFR_LOGS_MODERATION
+            - name: COCFR_MODERATION_ROLES
+              valueFrom:
+                secretKeyRef:
+                  name: cocfr-moderation-secrets
+                  key: COCFR_MODERATION_ROLES
+            - name: COCFR_MODERATION_USERS
+              valueFrom:
+                secretKeyRef:
+                  name: cocfr-moderation-secrets
+                  key: COCFR_MODERATION_USERS
+          envFrom:
+            - configMapRef:
+                name: common-config
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP

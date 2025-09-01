@@ -5,3 +5,11 @@ namespace: cocfr
 resources:
   - namespace.yml
   - clash-birthday
+  - clash-moderation
+  - github-registry-secret.yml
+
+configMapGenerator:
+  - name: common-config
+    literals:
+      - DB_HOST=infra-main-cluster.postgres.svc.cluster.local
+      - POSTGRESQL_HOSTNAME=infra-main-cluster.postgres.svc.cluster.local
