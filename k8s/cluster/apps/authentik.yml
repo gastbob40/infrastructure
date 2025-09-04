@@ -61,7 +61,7 @@ spec:
         # Server deployment configuration
         server:
           name: server
-          replicas: 1
+          replicas: 3
           # Environment variables from secrets
           env:
             - name: AUTHENTIK_SECRET_KEY
@@ -116,7 +116,7 @@ spec:
         # Worker deployment configuration  
         worker:
           name: worker
-          replicas: 1
+          replicas: 3
           # Environment variables from secrets
           env:
             - name: AUTHENTIK_SECRET_KEY
@@ -147,13 +147,6 @@ spec:
             persistence:
               enabled: true
               size: 1Gi
-            resources:
-              limits:
-                cpu: 250m
-                memory: 256Mi
-              requests:
-                cpu: 50m
-                memory: 128Mi
           auth:
             enabled: false
 
