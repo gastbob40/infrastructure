@@ -2,12 +2,12 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: flaresolverr
+  name: byparr
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
-    app: flaresolverr
+    app: byparr
 spec:
   syncPolicy:
     syncOptions:
@@ -16,13 +16,9 @@ spec:
       prune: true
   destination:
     name: in-cluster
-    namespace: flaresolverr
+    namespace: byparr
   project: default
   source:
-    repoURL: https://k8s-home-lab.github.io/helm-charts/
-    targetRevision: 6.0.3
-    chart: flaresolverr
-    helm:
-      values: |
-        image:
-          tag: v3.4.0
+    repoURL: https://github.com/gastbob40/infrastructure.git
+    targetRevision: main
+    path: k8s/cluster/byparr
