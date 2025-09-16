@@ -66,6 +66,26 @@ spec:
                 secretKeyRef:
                   name: cocfr-moderation-secrets
                   key: COCFR_MODERATION_USERS
+            - name: COCFR_DONATION_URL
+              valueFrom:
+                secretKeyRef:
+                  name: cocfr-moderation-secrets
+                  key: COCFR_DONATION_URL
+            - name: COCFR_DONOR_ROLE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cocfr-moderation-secrets
+                  key: COCFR_DONOR_ROLE_ID
+            - name: COCFR_DONOR_VIP_ROLE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cocfr-moderation-secrets
+                  key: COCFR_DONOR_VIP_ROLE_ID
+            - name: COCFR_DONOR_PRO_ROLE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cocfr-moderation-secrets
+                  key: COCFR_DONOR_PRO_ROLE_ID
           envFrom:
             - configMapRef:
                 name: common-config
