@@ -32,7 +32,7 @@ spec:
     authentik_db: authentik.authentik
 
   postgresql:
-    version: "13"
+    version: "17"
     parameters:
       max_connections: "500"
 
