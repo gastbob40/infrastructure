@@ -86,6 +86,21 @@ spec:
                 secretKeyRef:
                   name: cocfr-moderation-secrets
                   key: COCFR_DONOR_PRO_ROLE_ID
+            - name: COCFR_BANTEMP_ROLE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cocfr-moderation-secrets
+                  key: COCFR_BANTEMP_ROLE_ID
+            - name: COCFR_RULES_CHANNEL_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cocfr-moderation-secrets
+                  key: COCFR_RULES_CHANNEL_ID
+            - name: COCFR_GENERAL_CHANNEL_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cocfr-moderation-secrets
+                  key: COCFR_GENERAL_CHANNEL_ID
           envFrom:
             - configMapRef:
                 name: common-config
