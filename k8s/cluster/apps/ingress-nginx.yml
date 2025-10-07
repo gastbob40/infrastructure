@@ -25,12 +25,7 @@ spec:
           
           strategy:
             type: Recreate
-          
-          hostNetwork: true
-          hostPort:
-            enabled: true
-          dnsPolicy: ClusterFirstWithHostNet
-          
+
           nodeSelector:
             kubernetes.io/hostname: k8s-master
           
@@ -59,4 +54,4 @@ spec:
             enable-real-ip: "true"
             proxy-add-original-uri-header: "true"
           service:
-            type: ClusterIP
+            type: LoadBalancer
