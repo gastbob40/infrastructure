@@ -20,11 +20,14 @@ spec:
       values: |
         controller:
           kind: Deployment
-          replicaCount: 1
+          replicaCount: 2
           revisionHistoryLimit: 0
-          
+
           strategy:
-            type: Recreate
+            type: RollingUpdate
+            rollingUpdate:
+              maxUnavailable: 0
+              maxSurge: 1
 
           nodeSelector:
             kubernetes.io/hostname: k8s-master
