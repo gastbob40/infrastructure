@@ -31,18 +31,46 @@ jobs:
         echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
         echo "Latest MinIO version: $LATEST_TAG"
 
+    - name: Verify Docker image exists on Quay.io
+      id: verify-image
+      run: |
+        LATEST_TAG="${{ steps.latest-version.outputs.latest_tag }}"
+        echo "Checking if image quay.io/minio/minio:$LATEST_TAG exists..."
+
+        # Get all available tags from Quay.io
+        AVAILABLE_TAGS=$(curl -s "https://quay.io/api/v1/repository/minio/minio/tag/?page=1&limit=100&onlyActiveTags=true" | grep -o 'RELEASE\.[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}T[0-9]\{2\}-[0-9]\{2\}-[0-9]\{2\}Z' | sort -u)
+
+        if echo "$AVAILABLE_TAGS" | grep -q "^$LATEST_TAG$"; then
+          echo "✅ Docker image exists on Quay.io"
+          echo "image_exists=true" >> $GITHUB_OUTPUT
+          echo "verified_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+        else
+          echo "❌ Docker image not found on Quay.io, falling back to latest available"
+          # Get the most recent available tag
+          FALLBACK_TAG=$(echo "$AVAILABLE_TAGS" | tail -1)
+          echo "Using fallback version: $FALLBACK_TAG"
+          echo "image_exists=false" >> $GITHUB_OUTPUT
+          echo "verified_tag=$FALLBACK_TAG" >> $GITHUB_OUTPUT
+        fi
+
     - name: Compare versions and update if needed
       id: version-check
       run: |
         CURRENT="${{ steps.current-version.outputs.current_tag }}"
-        LATEST="${{ steps.latest-version.outputs.latest_tag }}"
-        
-        echo "Comparing: $CURRENT vs $LATEST"
-        
-        if [ "$CURRENT" != "$LATEST" ]; then
-          echo "New version available: $LATEST"
+        VERIFIED="${{ steps.verify-image.outputs.verified_tag }}"
+        GITHUB_LATEST="${{ steps.latest-version.outputs.latest_tag }}"
+        IMAGE_EXISTS="${{ steps.verify-image.outputs.image_exists }}"
+
+        echo "Comparing: $CURRENT vs $VERIFIED"
+
+        if [ "$IMAGE_EXISTS" == "false" ]; then
+          echo "⚠️ Warning: GitHub release $GITHUB_LATEST exists but Docker image not yet available"
+        fi
+
+        if [ "$CURRENT" != "$VERIFIED" ]; then
+          echo "New version available: $VERIFIED"
           echo "needs_update=true" >> $GITHUB_OUTPUT
-          echo "version_change=$CURRENT → $LATEST" >> $GITHUB_OUTPUT
+          echo "version_change=$CURRENT → $VERIFIED" >> $GITHUB_OUTPUT
         else
           echo "Already up to date"
           echo "needs_update=false" >> $GITHUB_OUTPUT
@@ -51,11 +79,11 @@ jobs:
     - name: Update MinIO version in chart
       if: steps.version-check.outputs.needs_update == 'true'
       run: |
-        LATEST_TAG="${{ steps.latest-version.outputs.latest_tag }}"
-        
+        VERIFIED_TAG="${{ steps.verify-image.outputs.verified_tag }}"
+
         # Mise à jour de la version dans le fichier YAML
-        sed -i "s|tag: \".*\"|tag: \"$LATEST_TAG\"|g" k8s/cluster/apps/minio-community.yml
-        
+        sed -i "s|tag: \".*\"|tag: \"$VERIFIED_TAG\"|g" k8s/cluster/apps/minio-community.yml
+
         # Vérification que le changement a été appliqué
         echo "Updated file content:"
         grep -A 2 'image:' k8s/cluster/apps/minio-community.yml | grep 'tag:'
@@ -72,29 +100,31 @@ jobs:
       uses: peter-evans/create-pull-request@v7
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        commit-message: "k8s: cluster: minio: bump to ${{ steps.latest-version.outputs.latest_tag }}"
-        title: "k8s: cluster: minio: bump to ${{ steps.latest-version.outputs.latest_tag }}"
+        commit-message: "k8s: cluster: minio: bump to ${{ steps.verify-image.outputs.verified_tag }}"
+        title: "k8s: cluster: minio: bump to ${{ steps.verify-image.outputs.verified_tag }}"
         body: |
           ## 🚀 Automatic MinIO Version Update
-          
+
           **Previous version:** `${{ steps.current-version.outputs.current_tag }}`
-          **New version:** `${{ steps.latest-version.outputs.latest_tag }}`
-          
+          **New version:** `${{ steps.verify-image.outputs.verified_tag }}`
+          ${{ steps.verify-image.outputs.image_exists == 'false' && '⚠️ **Note:** GitHub release `' || '' }}${{ steps.verify-image.outputs.image_exists == 'false' && steps.latest-version.outputs.latest_tag || '' }}${{ steps.verify-image.outputs.image_exists == 'false' && '` exists but Docker image not yet published. Using latest available Docker image.' || '' }}
+
           ### 📋 Changes
           - Updated MinIO image tag in `k8s/cluster/apps/minio-community.yml`
           - This update was automatically detected and applied
-          
+          - Docker image availability verified on Quay.io
+
           ### 🔍 Release Notes
-          Check the [MinIO releases page](https://github.com/minio/minio/releases/tag/${{ steps.latest-version.outputs.latest_tag }}) for details.
-          
+          Check the [MinIO releases page](https://github.com/minio/minio/releases/tag/${{ steps.verify-image.outputs.verified_tag }}) for details.
+
           ### ✅ Next Steps
           1. Review this PR for any breaking changes
           2. Test in a development environment if needed
           3. Merge to deploy the update via ArgoCD
-          
+
           ---
           🤖 *This PR was created automatically by GitHub Actions*
-        branch: auto-update/minio-${{ steps.latest-version.outputs.latest_tag }}
+        branch: auto-update/minio-${{ steps.verify-image.outputs.verified_tag }}
         delete-branch: true
         draft: false
         labels: |
