@@ -80,6 +80,8 @@ spec:
                 secretKeyRef:
                   name: authentik.authentik.infra-main-cluster.credentials.postgresql.acid.zalan.do
                   key: password
+            - name: AUTHENTIK_POSTGRESQL__SSLMODE
+              value: "require"
             # SMTP configuration for email sending
             - name: AUTHENTIK_EMAIL__HOST
               value: "smtp.resend.com"
@@ -153,6 +155,8 @@ spec:
                 secretKeyRef:
                   name: authentik.authentik.infra-main-cluster.credentials.postgresql.acid.zalan.do
                   key: password
+            - name: AUTHENTIK_POSTGRESQL__SSLMODE
+              value: "require"
             # SMTP configuration for email sending
             - name: AUTHENTIK_EMAIL__HOST
               value: "smtp.resend.com"
