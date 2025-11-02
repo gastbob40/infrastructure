@@ -43,6 +43,9 @@ spec:
     version: "17"
     parameters:
       max_connections: "500"
+      shared_buffers: "4GB"
+      effective_cache_size: "12GB"
+      maintenance_work_mem: "1GB"
 
   additionalVolumes:
     - name: pgbackup
