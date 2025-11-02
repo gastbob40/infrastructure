@@ -31,6 +31,14 @@ spec:
     clash_moderation: cocfr.clash_moderation
     authentik_db: authentik.authentik
 
+  resources:
+    requests:
+      cpu: "2"
+      memory: 8Gi
+    limits:
+      cpu: "4"
+      memory: 16Gi
+
   postgresql:
     version: "17"
     parameters:
