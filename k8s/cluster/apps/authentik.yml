@@ -36,7 +36,7 @@ spec:
   source:
     chart: authentik
     repoURL: https://charts.goauthentik.io
-    targetRevision: 2025.10.0
+    targetRevision: 2025.10.1
     helm:
       values: |
         # Global configuration
