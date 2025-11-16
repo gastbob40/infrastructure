@@ -1,0 +1,13 @@
+---
+kind: Kustomization
+
+commonLabels:
+  component: gift-viewer
+
+resources:
+  - deployment.yml
+  - ingress.yml
+  - secrets.yml
+  - service.yml
+  - github-registry-secret.yml
+

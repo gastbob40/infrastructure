@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gift-viewer
+  namespace: argocd
+  labels:
+    app: gift-viewer
+spec:
+  project: default
+  source:
+    path: k8s/apps/gift-viewer
+    repoURL: https://github.com/gastbob40/infrastructure.git
+    
+  destination:
+    name: in-cluster
+    namespace: gift-viewer
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

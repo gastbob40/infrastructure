@@ -20,6 +20,8 @@ spec:
     cocfr.clash_moderation: []
     meal-planner.meal_planner_api: []
     authentik.authentik: []
+    gift-viewer.gift_viewer: []
+
 
   # databases: name -> owner
   databases:
@@ -30,6 +32,7 @@ spec:
     clash_birthday: cocfr.clash_birthday
     clash_moderation: cocfr.clash_moderation
     authentik_db: authentik.authentik
+    gift_viewer: gift-viewer.gift_viewer
 
   resources:
     requests:

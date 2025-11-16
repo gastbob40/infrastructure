@@ -1,0 +1,54 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gift-viewer
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      component: gift-viewer
+  template:
+    metadata:
+      labels:
+        component: gift-viewer
+    spec:
+      imagePullSecrets:
+        - name: ghcr-pull-secret
+      containers:
+        - name: app
+          image: ghcr.io/gastbob40/gift-viewer
+          imagePullPolicy: Always
+          env:
+            - name: DATASOURCE_HOST
+              value: infra-main-cluster.postgres.svc.cluster.local
+            - name: DATASOURCE_DB
+              value: gift_viewer
+            - name: DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: gift-viewer.gift-viewer.infra-main-cluster.credentials.postgresql.acid.zalan.do
+                  key: username
+            - name: DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: gift-viewer.gift-viewer.infra-main-cluster.credentials.postgresql.acid.zalan.do
+                  key: password
+            - name: DEBUG
+              value: 'False'
+            - name: ALLOWED_HOSTS
+              value: 'gift.gastbob40.com'
+            - name: CSRF_TRUSTED_ORIGINS
+              value: 'https://gift.gastbob40.com'
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: gift-viewer-secrets
+                  key: SECRET_KEY
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+      securityContext:
+        fsGroup: 2000

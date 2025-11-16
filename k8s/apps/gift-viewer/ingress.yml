@@ -1,0 +1,28 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "gift-viewer"
+  namespace: "gift-viewer"
+  annotations:
+    cert-manager.io/cluster-issuer: default-issuer
+    cert-manager.io/revision-history-limit: "1"
+
+spec:
+  ingressClassName: public
+  rules:
+    - host: "gift.gastbob40.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: "gift-viewer"
+                port:
+                  number: 8000
+
+  tls:
+    - hosts:
+        - "gift.gastbob40.com"
+      secretName: "gift-viewer-tls"
