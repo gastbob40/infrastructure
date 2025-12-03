@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://charts.redpanda.com
-    targetRevision: 25.1.2
+    targetRevision: 25.2.1
     chart: redpanda
     helm:
       values: |
