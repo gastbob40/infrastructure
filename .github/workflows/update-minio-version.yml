@@ -97,7 +97,7 @@ jobs:
 
     - name: Create Pull Request
       if: steps.version-check.outputs.needs_update == 'true'
-      uses: peter-evans/create-pull-request@v7
+      uses: peter-evans/create-pull-request@v8
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         commit-message: "k8s: cluster: minio: bump to ${{ steps.verify-image.outputs.verified_tag }}"
