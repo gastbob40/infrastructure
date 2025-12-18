@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://opensource.zalando.com/postgres-operator/charts/postgres-operator
     chart: postgres-operator
-    targetRevision: 1.14.0
+    targetRevision: 1.15.1
     helm:
       values: |
         configKubernetes:
