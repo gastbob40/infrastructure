@@ -24,7 +24,7 @@ spec:
   project: default
   source:
     repoURL: https://oauth2-proxy.github.io/manifests
-    targetRevision: 10.1.3
+    targetRevision: 10.1.4
     chart: oauth2-proxy
     helm:
       values: |
