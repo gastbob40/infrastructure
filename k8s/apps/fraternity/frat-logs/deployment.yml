@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   name: frat-logs
 spec:
-  replicas: 1
+  replicas: 3
   revisionHistoryLimit: 0
   selector:
     matchLabels:
