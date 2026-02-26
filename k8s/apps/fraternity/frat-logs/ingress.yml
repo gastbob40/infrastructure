@@ -7,6 +7,9 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: default-issuer
     cert-manager.io/revision-history-limit: "1"
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/session-cookie-name: "FRAT_LOGS_AFFINITY"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "3600"
 
 spec:
   ingressClassName: public
