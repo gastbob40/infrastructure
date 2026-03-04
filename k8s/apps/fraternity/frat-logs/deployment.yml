@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: app
-          image: systemfraternity/frat_logs
+          image: gastbob40/frat_logs
           imagePullPolicy: Always
           env:
             - name: POD_METADATA_UID
