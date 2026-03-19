@@ -16,6 +16,7 @@ spec:
     fraternity.frat_dump: []
     fraternity.frat_logs: []
     fraternity.frat_shop: []
+    fraternity.fraternity-api: []
     cocfr.clash_birthday: []
     cocfr.clash_moderation: []
     meal-planner.meal_planner_api: []
@@ -28,6 +29,7 @@ spec:
     frat_dump: fraternity.frat_dump
     frat_logs: fraternity.frat_logs
     frat_shop: fraternity.frat_shop
+    fraternity_api: fraternity.fraternity-api
     meal_planner_api: meal-planner.meal_planner_api
     clash_birthday: cocfr.clash_birthday
     clash_moderation: cocfr.clash_moderation

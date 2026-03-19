@@ -1,0 +1,75 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fraternity-api
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      component: fraternity-api
+  template:
+    metadata:
+      labels:
+        component: fraternity-api
+    spec:
+      imagePullSecrets:
+        - name: ghcr-pull-secret
+      containers:
+        - name: app
+          image: ghcr.io/gastbob40/fraternity-api:latest
+          imagePullPolicy: Always
+          env:
+            - name: POSTGRESQL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: fraternity.fraternity-api.infra-main-cluster.credentials.postgresql.acid.zalan.do
+                  key: username
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: fraternity.fraternity-api.infra-main-cluster.credentials.postgresql.acid.zalan.do
+                  key: password
+            - name: POSTGRESQL_HOSTNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: common-config
+                  key: DB_HOST
+            - name: POSTGRESQL_DATABASE
+              value: fraternity_api
+            - name: POSTGRESQL_SSL_MODE
+              value: disable
+            - name: OAUTH_DISCORD_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: fraternity-api-secrets
+                  key: OAUTH_DISCORD_CLIENT_ID
+            - name: OAUTH_DISCORD_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: fraternity-api-secrets
+                  key: OAUTH_DISCORD_CLIENT_SECRET
+            - name: OAUTH_DISCORD_REDIRECT_URI
+              value: https://fraternity.gastbob40.com/auth/discord/callback
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: fraternity-api-secrets
+                  key: SESSION_SECRET
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health/liveness
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health/readiness
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
