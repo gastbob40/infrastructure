@@ -6,6 +6,7 @@ resources:
   - namespace.yml
   - frat-logs
   - frat-shop
+  - fraternity-api
 
 configMapGenerator:
   - name: common-config
