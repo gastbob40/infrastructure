@@ -61,6 +61,8 @@ spec:
                 secretKeyRef:
                   name: fraternity-api-secrets
                   key: SESSION_SECRET
+            - name: DISCORD_GUILD_ID
+              value: "704644331138711582"
           ports:
             - name: http
               containerPort: 8080
