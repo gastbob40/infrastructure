@@ -1,0 +1,47 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: discord-presence
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: update
+              image: debian:bookworm-slim
+              command: ["/bin/bash", "/scripts/update.sh"]
+              env:
+                - name: FRATERNITY_SERVER_ID
+                  value: "k53gra"
+                - name: FRATERNITY_CHANNEL_ID
+                  value: "860136032720650300"
+                - name: FRATWORLD_SERVER_ID
+                  value: "am774e"
+                - name: FRATWORLD_CHANNEL_ID
+                  value: "1485298699092361327"
+                - name: FRATERNITY_BOT_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: discord-presence-secrets
+                      key: FRATERNITY_BOT_TOKEN
+                - name: FRATWORLD_BOT_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: discord-presence-secrets
+                      key: FRATWORLD_BOT_TOKEN
+              volumeMounts:
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+          volumes:
+            - name: scripts
+              configMap:
+                name: discord-presence-script
+                defaultMode: 0755

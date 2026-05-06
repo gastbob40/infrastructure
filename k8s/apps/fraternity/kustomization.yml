@@ -7,6 +7,7 @@ resources:
   - frat-logs
   - frat-shop
   - fraternity-api
+  - discord-presence
 
 configMapGenerator:
   - name: common-config

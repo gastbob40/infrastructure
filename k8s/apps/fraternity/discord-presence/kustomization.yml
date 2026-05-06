@@ -1,0 +1,14 @@
+---
+kind: Kustomization
+
+commonLabels:
+  component: discord-presence
+
+resources:
+  - cronjob.yml
+  - secrets.yml
+
+configMapGenerator:
+  - name: discord-presence-script
+    files:
+      - update.sh
