@@ -14,7 +14,6 @@ spec:
   # users: name -> permissions (usually [])
   users:
     fraternity.frat_dump: []
-    fraternity.frat_logs: []
     fraternity.frat_shop: []
     fraternity.fraternity-api: []
     cocfr.clash_birthday: []
@@ -27,7 +26,6 @@ spec:
   # databases: name -> owner
   databases:
     frat_dump: fraternity.frat_dump
-    frat_logs: fraternity.frat_logs
     frat_shop: fraternity.frat_shop
     fraternity_api: fraternity.fraternity-api
     meal_planner_api: meal-planner.meal_planner_api
