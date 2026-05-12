@@ -111,6 +111,11 @@ spec:
                 secretKeyRef:
                   name: cocfr-moderation-secrets
                   key: COCFR_SUGGESTION_ROLE_ID
+            - name: COCFR_LOGS_INVITES
+              valueFrom:
+                secretKeyRef:
+                  name: cocfr-moderation-secrets
+                  key: COCFR_LOGS_INVITES
           envFrom:
             - configMapRef:
                 name: common-config
