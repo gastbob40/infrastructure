@@ -6,7 +6,7 @@ apt-get update -qq
 apt-get install -y --no-install-recommends curl jq ca-certificates >/dev/null
 
 fetch_players() {
-  curl -fsS "https://servers-frontend.fivem.net/api/servers/single/$1" | jq -r '.Data.clients'
+  curl -fsS "https://frontend.cfx-services.net/api/servers/single/$1" | jq -r '.Data.clients'
 }
 
 update_channel() {
