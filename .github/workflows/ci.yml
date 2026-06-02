@@ -24,7 +24,7 @@ jobs:
           echo "Pluto Report:" && cat pluto-results/pluto-report.txt
 
       - name: Upload Pluto Report as Artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: pluto-deprecation-report
           path: pluto-results/pluto-report.txt
