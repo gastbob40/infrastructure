@@ -1,6 +1,6 @@
 # create docker with postgres & aws
 
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 
 RUN  apt-get update && apt-get install -y curl unzip zip postgresql-client jq && \
     ARCH=$(uname -m) && \
