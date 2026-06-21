@@ -1,0 +1,15 @@
+---
+kind: Kustomization
+
+# Use `labels` with includeSelectors: false so the label is NOT injected into
+# the Service selector. This Service has no selector on purpose (external
+# backend via manual Endpoints); a selector would make Kubernetes overwrite
+# our Endpoints with empty ones -> 503.
+labels:
+  - pairs:
+      component: home-assistant
+    includeSelectors: false
+
+resources:
+  - service.yml
+  - ingress.yml

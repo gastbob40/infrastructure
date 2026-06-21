@@ -1,0 +1,31 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "home-assistant"
+  namespace: "home-assistant"
+  annotations:
+    cert-manager.io/cluster-issuer: default-issuer
+    cert-manager.io/revision-history-limit: "1"
+    # Home Assistant needs WebSocket support for the frontend
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+
+spec:
+  ingressClassName: public
+  rules:
+    - host: "ha.gastbob40.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: "home-assistant"
+                port:
+                  number: 8123
+
+  tls:
+    - hosts:
+        - "ha.gastbob40.com"
+      secretName: "home-assistant-tls"

@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: home-assistant
+  namespace: argocd
+  labels:
+    app: home-assistant
+spec:
+  project: default
+  source:
+    path: k8s/apps/home-assistant
+    repoURL: https://github.com/gastbob40/infrastructure.git
+
+  destination:
+    name: in-cluster
+    namespace: home-assistant
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
