@@ -126,6 +126,11 @@ spec:
                 secretKeyRef:
                   name: cocfr-moderation-secrets
                   key: COCFR_RESTRICTION_HOURS_BETWEEN_POSTS
+            - name: COCFR_FW_CHANNEL_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cocfr-moderation-secrets
+                  key: COCFR_FW_CHANNEL_ID
           envFrom:
             - configMapRef:
                 name: common-config
