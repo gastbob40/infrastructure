@@ -1,0 +1,32 @@
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: climradar-stock-watch
+  namespace: climradar
+---
+# Le script mémorise l'état de disponibilité dans un ConfigMap in-cluster
+# (créé/patché à la volée) pour n'envoyer un SMS que lorsque la dispo change.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: climradar-stock-watch-state
+  namespace: climradar
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "create", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: climradar-stock-watch-state
+  namespace: climradar
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: climradar-stock-watch-state
+subjects:
+  - kind: ServiceAccount
+    name: climradar-stock-watch
+    namespace: climradar

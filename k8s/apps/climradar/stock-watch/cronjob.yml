@@ -1,0 +1,55 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: climradar-stock-watch
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: climradar-stock-watch
+          restartPolicy: OnFailure
+          containers:
+            - name: watch
+              image: python:3.13-slim
+              command: ["python3", "/scripts/watch.py"]
+              env:
+                # Produits surveillés (ids climradar) — vide = tous les produits
+                - name: PRODUCTS
+                  value: ""
+                # Point de référence : CP 95240, Cormeilles-en-Parisis
+                - name: REF_LAT
+                  value: "48.976"
+                - name: REF_LON
+                  value: "2.197"
+                - name: RADIUS_KM
+                  value: "30"
+                # Un magasin en ligne dans ces pays est considéré "livrable"
+                - name: DELIVER_COUNTRIES
+                  value: "FR"
+                - name: STATE_CONFIGMAP
+                  value: "climradar-stock-state"
+                - name: FREE_SMS_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: climradar-stock-watch-secrets
+                      key: FREE_SMS_USER
+                - name: FREE_SMS_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      name: climradar-stock-watch-secrets
+                      key: FREE_SMS_PASS
+              volumeMounts:
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+          volumes:
+            - name: scripts
+              configMap:
+                name: climradar-stock-watch-script
+                defaultMode: 0755

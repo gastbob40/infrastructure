@@ -1,0 +1,15 @@
+---
+kind: Kustomization
+
+commonLabels:
+  component: climradar-stock-watch
+
+resources:
+  - rbac.yml
+  - secrets.yml
+  - cronjob.yml
+
+configMapGenerator:
+  - name: climradar-stock-watch-script
+    files:
+      - watch.py

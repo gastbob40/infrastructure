@@ -1,0 +1,7 @@
+---
+kind: Kustomization
+namespace: climradar
+
+resources:
+  - namespace.yml
+  - stock-watch
