@@ -10,6 +10,7 @@ import math
 import os
 import ssl
 import sys
+import traceback
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -113,6 +114,20 @@ def send_sms(message):
         return resp.status
 
 
+def try_send_sms(message):
+    """Envoie best-effort : renvoie True si le SMS est parti (HTTP 200)."""
+    try:
+        code = send_sms(message)
+        print(f"SMS envoyé (HTTP {code})")
+        return True
+    except urllib.error.HTTPError as e:
+        hint = {402: "rate limit", 403: "creds/service KO", 400: "param manquant"}
+        print(f"Échec SMS: HTTP {e.code} ({hint.get(e.code, '?')})")
+    except Exception as e:  # noqa: BLE001
+        print(f"Échec SMS: {e}")
+    return False
+
+
 # --- État persistant via ConfigMap in-cluster -------------------------------
 
 def _k8s_ctx():
@@ -145,48 +160,85 @@ def _k8s_req(method, path, body=None):
 _K8S = _k8s_ctx()
 
 
-def load_signature():
+def load_state():
+    """Renvoie le dict `data` du ConfigMap d'état (vide si absent/inaccessible)."""
     if not _K8S:
-        return None
-    status, cm = _k8s_req("GET", "/api/v1/namespaces/{ns}/configmaps/" + STATE_CM)
+        return {}
+    try:
+        status, cm = _k8s_req("GET", "/api/v1/namespaces/{ns}/configmaps/" + STATE_CM)
+    except Exception as e:  # noqa: BLE001
+        print(f"Lecture état KO: {e}")
+        return {}
     if status == 200 and cm:
-        return (cm.get("data") or {}).get("signature", "")
-    return "" if status == 404 else None
+        return cm.get("data") or {}
+    return {}
 
 
-def save_signature(sig):
+def save_state(patch):
+    """Merge-patch des clés fournies dans le ConfigMap d'état (best-effort)."""
     if not _K8S:
         return
-    path = "/api/v1/namespaces/{ns}/configmaps/" + STATE_CM
-    status, _ = _k8s_req("PATCH", path, {"data": {"signature": sig}})
-    if status == 404:
-        body = {
-            "metadata": {"name": STATE_CM},
-            "data": {"signature": sig},
-        }
-        _k8s_req("POST", "/api/v1/namespaces/{ns}/configmaps", body)
+    try:
+        path = "/api/v1/namespaces/{ns}/configmaps/" + STATE_CM
+        status, _ = _k8s_req("PATCH", path, {"data": patch})
+        if status == 404:
+            body = {"metadata": {"name": STATE_CM}, "data": patch}
+            _k8s_req("POST", "/api/v1/namespaces/{ns}/configmaps", body)
+    except Exception as e:  # noqa: BLE001
+        print(f"Écriture état KO: {e}")
+
+
+def notify_offers(offers):
+    new_sig = ";".join(o["key"] for o in offers)
+    state = load_state()
+    old_sig = state.get("signature", "")
+    prev_error = state.get("error", "")
+
+    print(f"{len(offers)} offre(s) dispo | sig={new_sig!r} old={old_sig!r}")
+
+    patch = {}
+    if new_sig != old_sig:
+        if offers:
+            # On ne mémorise la nouvelle signature que si le SMS est bien parti,
+            # sinon on retentera au prochain tick (utile en cas de rate limit).
+            if try_send_sms(format_sms(offers)):
+                patch["signature"] = new_sig
+        else:
+            # Plus rien de dispo : on efface silencieusement.
+            patch["signature"] = new_sig
+    else:
+        print("Pas de changement, aucun SMS.")
+
+    # Le fetch/compute vient de réussir : si on était en erreur, on prévient.
+    if prev_error:
+        if try_send_sms("✅ climradar : fetch rétabli, surveillance OK"):
+            patch["error"] = ""
+
+    if patch:
+        save_state(patch)
+
+
+def notify_error(exc):
+    traceback.print_exc()
+    err = f"{type(exc).__name__}: {exc}"[:150]
+    prev_error = load_state().get("error", "")
+    if err != prev_error:
+        if try_send_sms(f"⚠️ climradar en panne:\n{err}"):
+            save_state({"error": err})
+    else:
+        print("Erreur déjà notifiée, pas de nouveau SMS.")
 
 
 def main():
     if not FREE_USER or not FREE_PASS:
         sys.exit("FREE_SMS_USER / FREE_SMS_PASS manquants")
-
-    data = http_get_json(API_URL)
-    offers = find_offers(data)
-    new_sig = ";".join(o["key"] for o in offers)
-    old_sig = load_signature()
-
-    print(f"{len(offers)} offre(s) dispo | sig={new_sig!r} old={old_sig!r}")
-
-    if offers and new_sig != old_sig:
-        msg = format_sms(offers)
-        print("Envoi SMS:\n" + msg)
-        send_sms(msg)
-    else:
-        print("Pas de changement, aucun SMS.")
-
-    if new_sig != old_sig:
-        save_signature(new_sig)
+    try:
+        data = http_get_json(API_URL)
+        offers = find_offers(data)
+    except Exception as exc:  # noqa: BLE001
+        notify_error(exc)
+        return
+    notify_offers(offers)
 
 
 if __name__ == "__main__":
