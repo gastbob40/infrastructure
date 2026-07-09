@@ -15,7 +15,7 @@ spec:
   source:
     repoURL: https://charts.jetstack.io
     chart: cert-manager
-    targetRevision: v1.20.2
+    targetRevision: v1.21.0
     helm:
       values: |
         webhook:
