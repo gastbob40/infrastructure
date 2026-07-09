@@ -4,7 +4,7 @@ kind: CronJob
 metadata:
   name: climradar-stock-watch
 spec:
-  schedule: "*/5 * * * *"
+  schedule: "*/2 * * * *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
