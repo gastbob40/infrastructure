@@ -1,0 +1,51 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: climradar-delivery-watch
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: climradar-delivery-watch
+          restartPolicy: OnFailure
+          containers:
+            - name: watch
+              image: python:3.14-slim
+              command: ["python3", "/scripts/watch.py"]
+              env:
+                # Offre ManoMano surveillée (deliveryPromise GraphQL)
+                - name: MANOMANO_OFFER_ID
+                  value: "9bb57a52-b401-4583-874e-c819358871a5"
+                # Offre Castorama surveillée (compositeOfferId fulfilment-options)
+                - name: CASTORAMA_OFFER_ID
+                  value: "8431312260509"
+                # Point de référence : CP 95240, Cormeilles-en-Parisis
+                - name: POSTAL_CODE
+                  value: "95240"
+                - name: STATE_CONFIGMAP
+                  value: "climradar-delivery-state"
+                - name: FREE_SMS_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: climradar-stock-watch-secrets
+                      key: FREE_SMS_USER
+                - name: FREE_SMS_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      name: climradar-stock-watch-secrets
+                      key: FREE_SMS_PASS
+              volumeMounts:
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+          volumes:
+            - name: scripts
+              configMap:
+                name: climradar-delivery-watch-script
+                defaultMode: 0755

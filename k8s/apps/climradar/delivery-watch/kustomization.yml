@@ -1,0 +1,14 @@
+---
+kind: Kustomization
+
+commonLabels:
+  component: climradar-delivery-watch
+
+resources:
+  - rbac.yml
+  - cronjob.yml
+
+configMapGenerator:
+  - name: climradar-delivery-watch-script
+    files:
+      - watch.py
