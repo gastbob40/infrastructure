@@ -99,14 +99,45 @@ def fetch_manomano():
     options = []
     for p in delivery.get("promises") or []:
         window = ""
-        if p.get("periodMin") is not None and p.get("periodMax") is not None:
-            window = f" {p['periodMin']}-{p['periodMax']}j"
-        price = p.get("price") or {}
-        cost = ""
-        if price.get("amount") is not None:
-            cost = f" {price['amount']}{price.get('currency', '')}"
-        options.append(f"{p.get('name') or p.get('mode') or 'livraison'}{window}{cost}")
+        start, end = _format_period(p.get("periodMin")), _format_period(p.get("periodMax"))
+        if start and end:
+            window = f" {start}→{end}" if start != end else f" {start}"
+        label = p.get("name") or MANOMANO_MODES.get(
+            p.get("mode"), (p.get("mode") or "livraison").replace("_", " ").lower()
+        )
+        options.append(f"{label}{window}{_format_price(p.get('price'))}")
     return options
+
+
+MANOMANO_MODES = {
+    "POST_ORDER_SCHEDULED_DELIVERY": "livraison programmée",
+    "SCHEDULED_DELIVERY": "livraison programmée",
+    "HOME_DELIVERY": "livraison à domicile",
+    "RELAY_DELIVERY": "point relais",
+}
+
+
+def _format_period(value):
+    """periodMin/periodMax sont des horodatages ISO (ex: 2026-07-28T00:00Z)."""
+    if value is None:
+        return ""
+    s = str(value)
+    if "T" in s and s.count("-") >= 2:
+        year, month, day = s.split("T")[0].split("-")[:3]
+        return f"{day}/{month}"
+    return s
+
+
+def _format_price(price):
+    amount = (price or {}).get("amount")
+    if amount is None:
+        return ""
+    try:
+        if float(amount) == 0:
+            return " offerte"
+    except (TypeError, ValueError):
+        pass
+    return f" {amount}{(price or {}).get('currency', '')}"
 
 
 CASTORAMA_CHANNELS = {
