@@ -5,6 +5,7 @@ metadata:
   name: climradar-stock-watch
 spec:
   schedule: "*/2 * * * *"
+  suspend: true
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
