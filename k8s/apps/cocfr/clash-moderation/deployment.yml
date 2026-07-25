@@ -131,6 +131,11 @@ spec:
                 secretKeyRef:
                   name: cocfr-moderation-secrets
                   key: COCFR_FW_CHANNEL_ID
+            - name: COCFR_PHOTOS_CHANNEL_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cocfr-moderation-secrets
+                  key: COCFR_PHOTOS_CHANNEL_ID
           envFrom:
             - configMapRef:
                 name: common-config
