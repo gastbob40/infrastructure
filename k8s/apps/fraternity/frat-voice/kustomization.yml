@@ -1,0 +1,9 @@
+---
+kind: Kustomization
+
+commonLabels:
+  component: frat-voice
+
+resources:
+  - deployment.yml
+  - secrets.yml

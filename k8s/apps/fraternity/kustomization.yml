@@ -5,6 +5,7 @@ namespace: fraternity
 resources:
   - namespace.yml
   - frat-shop
+  - frat-voice
   - fraternity-api
   - discord-presence
 
