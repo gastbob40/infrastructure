@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: books
+  namespace: argocd
+  labels:
+    app: books
+spec:
+  project: default
+  source:
+    path: k8s/apps/books
+    repoURL: https://github.com/gastbob40/infrastructure.git
+
+  destination:
+    name: in-cluster
+    namespace: books
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

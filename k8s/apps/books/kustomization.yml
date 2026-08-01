@@ -1,0 +1,13 @@
+---
+kind: Kustomization
+namespace: books
+
+commonLabels:
+  component: books
+
+resources:
+  - namespace.yml
+  - pvc.yml
+  - deployment.yml
+  - ingress.yml
+  - service.yml

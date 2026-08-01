@@ -1,0 +1,74 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: books
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  # Volumes RWO : jamais deux pods sur les mêmes PVC pendant un rollout
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      component: books
+  template:
+    metadata:
+      labels:
+        component: books
+    spec:
+      # local-path stocke sur le disque du noeud : la bibliothèque est
+      # épinglée sur k8s-slave-02 (~190Gi libres)
+      nodeSelector:
+        kubernetes.io/hostname: k8s-slave-02
+      containers:
+        - name: app
+          image: crocodilestick/calibre-web-automated:v4.0.6
+          env:
+            - name: PUID
+              value: '1000'
+            - name: PGID
+              value: '1000'
+            - name: TZ
+              value: Europe/Paris
+          ports:
+            - name: http
+              containerPort: 8083
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: library
+              mountPath: /calibre-library
+            - name: ingest
+              mountPath: /cwa-book-ingest
+          # L'init s6 + calibre met un moment à répondre au premier démarrage
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 10
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              memory: 3Gi
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: books-config
+        - name: library
+          persistentVolumeClaim:
+            claimName: books-library
+        - name: ingest
+          persistentVolumeClaim:
+            claimName: books-ingest
+      securityContext:
+        fsGroup: 1000

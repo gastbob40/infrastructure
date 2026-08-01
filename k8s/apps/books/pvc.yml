@@ -1,0 +1,42 @@
+---
+# local-path n'autorise pas l'expansion : les tailles sont indicatives
+# (pas de quota appliqué par le provisioner), mais le pod reste lié au
+# disque du noeud sur lequel il est planifié.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: books-config
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 2Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: books-library
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 50Gi
+
+---
+# Dossier d'import : les fichiers déposés ici sont ingérés puis supprimés
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: books-ingest
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 10Gi

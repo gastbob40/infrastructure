@@ -1,0 +1,32 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: "books"
+  namespace: "books"
+  annotations:
+    cert-manager.io/cluster-issuer: default-issuer
+    cert-manager.io/revision-history-limit: "1"
+    # Upload d'epub en lot depuis le navigateur
+    nginx.ingress.kubernetes.io/proxy-body-size: "512m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+
+spec:
+  ingressClassName: public
+  rules:
+    - host: "books.gastbob40.com"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: "books"
+                port:
+                  number: 8083
+
+  tls:
+    - hosts:
+        - "books.gastbob40.com"
+      secretName: "books-tls"
