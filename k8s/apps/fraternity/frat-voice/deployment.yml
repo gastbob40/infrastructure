@@ -36,6 +36,11 @@ spec:
               value: "5432"
             - name: DATABASE_NAME
               value: frat_voice
+            # the operator's pg_hba rejects unencrypted connections, and
+            # node-postgres does not negotiate TLS on its own. no-verify
+            # encrypts without checking the operator's self-signed cert.
+            - name: PGSSLMODE
+              value: no-verify
             - name: DATABASE_USER
               valueFrom:
                 secretKeyRef:
