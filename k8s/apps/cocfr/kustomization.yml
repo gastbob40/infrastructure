@@ -6,6 +6,7 @@ resources:
   - namespace.yml
   - clash-birthday
   - clash-moderation
+  - support
   - github-registry-secret.yml
 
 configMapGenerator:

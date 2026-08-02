@@ -1,0 +1,16 @@
+---
+kind: Kustomization
+
+commonLabels:
+  component: cocfr-support
+
+resources:
+  - deployment.yml
+  - secrets.yml
+
+# Generated rather than hand-written so the hash suffix rolls the deployment
+# whenever the ticket categories change
+configMapGenerator:
+  - name: cocfr-support-config
+    files:
+      - config.yml

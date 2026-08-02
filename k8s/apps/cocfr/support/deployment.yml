@@ -1,0 +1,43 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cocfr-support
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      component: cocfr-support
+  template:
+    metadata:
+      labels:
+        component: cocfr-support
+    spec:
+      imagePullSecrets:
+        - name: ghcr-pull-secret
+      containers:
+        - name: app
+          image: ghcr.io/gastbob40/cocfr-support:latest
+          imagePullPolicy: Always
+          env:
+            - name: POD_METADATA_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cocfr-support-secrets
+                  key: BOT_TOKEN
+          volumeMounts:
+            # The bot opens run/config.yml relative to its workdir (/app)
+            - name: config
+              mountPath: /app/run
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: cocfr-support-config

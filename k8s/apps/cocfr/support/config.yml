@@ -1,0 +1,23 @@
+---
+guild_id: 278653494846685186
+log_channel: 352546426108117002
+
+tickets:
+  - name: CoCFR
+    categories:
+      - name: Demande role chef de clan
+        category_id: 933692238070947871
+      - name: Demande role ytb
+        category_id: 934533279103725629
+      - name: Demande role nitro
+        category_id: 934533378059952148
+      - name: Pub MP & Insulte & Spam
+        category_id: 934533458741592185
+      - name: Vente Achat de compte
+        category_id: 934533983155400756
+      - name: Donation
+        category_id: 1407382592570785842
+      - name: Hall Of Fame (HOF)
+        category_id: 1407382873543151747
+      - name: Autre
+        category_id: 934534069797150831
