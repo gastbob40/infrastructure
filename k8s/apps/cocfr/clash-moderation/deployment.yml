@@ -136,6 +136,16 @@ spec:
                 secretKeyRef:
                   name: cocfr-moderation-secrets
                   key: COCFR_PHOTOS_CHANNEL_ID
+            - name: DISCORD_OAUTH_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cocfr-moderation-secrets
+                  key: DISCORD_OAUTH_CLIENT_ID
+            - name: DISCORD_OAUTH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: cocfr-moderation-secrets
+                  key: DISCORD_OAUTH_CLIENT_SECRET
           envFrom:
             - configMapRef:
                 name: common-config
