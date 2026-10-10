@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: chronodrive-proxy
+spec:
+  podSelector:
+    matchLabels:
+      component: chronodrive-proxy
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              component: meal-planner-api
+      ports:
+        - protocol: TCP
+          port: 1055

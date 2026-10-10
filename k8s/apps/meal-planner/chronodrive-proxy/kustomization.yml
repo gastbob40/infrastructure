@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+labels:
+  - pairs:
+      component: chronodrive-proxy
+    includeSelectors: false
+resources:
+  - deployment.yml
+  - service.yml
+  - secrets.yml
+  - storage.yml
+  - network-policy.yml

@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chronodrive-proxy
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      component: chronodrive-proxy
+  template:
+    metadata:
+      labels:
+        component: chronodrive-proxy
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: tailscale
+          image: tailscale/tailscale:v1.98.4
+          env:
+            - name: TS_AUTHKEY
+              valueFrom:
+                secretKeyRef:
+                  name: chronodrive-tailscale-auth
+                  key: CHRONODRIVE_TAILSCALE_AUTH_KEY
+            - name: TS_AUTH_ONCE
+              value: "true"
+            - name: TS_HOSTNAME
+              value: meal-planner-chronodrive-proxy
+            - name: TS_USERSPACE
+              value: "true"
+            - name: TS_KUBE_SECRET
+              value: ""
+            - name: TS_STATE_DIR
+              value: /var/lib/tailscale
+            - name: TS_EXTRA_ARGS
+              value: --exit-node=100.102.81.97 --accept-dns=false --accept-routes=false
+            - name: TS_OUTBOUND_HTTP_PROXY_LISTEN
+              value: 0.0.0.0:1055
+            - name: TS_ENABLE_HEALTH_CHECK
+              value: "true"
+            - name: TS_LOCAL_ADDR_PORT
+              value: 0.0.0.0:9002
+          ports:
+            - name: proxy
+              containerPort: 1055
+            - name: health
+              containerPort: 9002
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: health
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: state
+              mountPath: /var/lib/tailscale
+      volumes:
+        - name: state
+          persistentVolumeClaim:
+            claimName: chronodrive-tailscale-state
