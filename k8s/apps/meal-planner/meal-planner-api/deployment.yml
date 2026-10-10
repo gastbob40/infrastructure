@@ -59,6 +59,46 @@ spec:
                 secretKeyRef:
                   name: meal-planner-backend-secrets
                   key: HELLOFRESH_PASSWORD
+            - name: CHRONODRIVE_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: meal-planner-backend-secrets
+                  key: CHRONODRIVE_EMAIL
+            - name: CHRONODRIVE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: meal-planner-backend-secrets
+                  key: CHRONODRIVE_PASSWORD
+            - name: CHRONODRIVE_CUSTOMERS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: meal-planner-backend-secrets
+                  key: CHRONODRIVE_CUSTOMERS_API_KEY
+            - name: CHRONODRIVE_PRODUCTS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: meal-planner-backend-secrets
+                  key: CHRONODRIVE_PRODUCTS_API_KEY
+            - name: CHRONODRIVE_SUGGESTIONS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: meal-planner-backend-secrets
+                  key: CHRONODRIVE_SUGGESTIONS_API_KEY
+            - name: CHRONODRIVE_CARTS_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: meal-planner-backend-secrets
+                  key: CHRONODRIVE_CARTS_API_KEY
+            - name: CHRONODRIVE_CATEGORIES_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: meal-planner-backend-secrets
+                  key: CHRONODRIVE_CATEGORIES_API_KEY
+            - name: CHRONODRIVE_SITE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: meal-planner-backend-secrets
+                  key: CHRONODRIVE_SITE_ID
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: redpanda.redpanda.svc.cluster.local:9093
             - name: FLARESOLVERR_URL
