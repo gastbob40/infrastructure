@@ -19,6 +19,8 @@ spec:
           image: gastbob40/meal-planner-api
           imagePullPolicy: Always
           env:
+            - name: QUARKUS_CONFIG_LOCATIONS
+              value: file:/etc/chronodrive/application.properties
             - name: POD_METADATA_UID
               valueFrom:
                 fieldRef:
@@ -103,6 +105,10 @@ spec:
               value: redpanda.redpanda.svc.cluster.local:9093
             - name: FLARESOLVERR_URL
               value: http://flaresolverr.flaresolverr.svc.cluster.local:8191/v1
+          volumeMounts:
+            - name: chronodrive-client-config
+              mountPath: /etc/chronodrive
+              readOnly: true
           envFrom:
             - configMapRef:
                 name: common-config
@@ -110,3 +116,7 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+      volumes:
+        - name: chronodrive-client-config
+          configMap:
+            name: chronodrive-client-config

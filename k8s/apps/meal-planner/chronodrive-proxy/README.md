@@ -20,3 +20,9 @@ Home Assistant must advertise an approved exit node.
 Readiness checks Tailscale initialization, not Chronodrive reachability. Home
 Assistant and the residential internet connection must be online for API calls.
 Deploy through the Meal Planner ArgoCD application after committing changes.
+
+The backend mounts `meal-planner-api/chronodrive.properties` as an additional
+Quarkus configuration file. Both `chronodrive-api` (including categories) and
+`chronodrive-auth` use this proxy. Other REST clients keep their existing route.
+To restore direct access, set both proxy-address properties to `none`, commit,
+and sync ArgoCD. Kustomize config hashes trigger a backend rollout on changes.

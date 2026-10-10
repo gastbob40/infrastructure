@@ -5,6 +5,9 @@ commonLabels:
   component: meal-planner-api
 
 configMapGenerator:
+  - name: chronodrive-client-config
+    files:
+      - application.properties=chronodrive.properties
   - name: common-config
     literals:
       - DB_HOST=infra-main-cluster.postgres.svc.cluster.local
