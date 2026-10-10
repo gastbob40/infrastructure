@@ -103,8 +103,6 @@ spec:
                   key: CHRONODRIVE_SITE_ID
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: redpanda.redpanda.svc.cluster.local:9093
-            - name: FLARESOLVERR_URL
-              value: http://flaresolverr.flaresolverr.svc.cluster.local:8191/v1
           volumeMounts:
             - name: chronodrive-client-config
               mountPath: /etc/chronodrive
