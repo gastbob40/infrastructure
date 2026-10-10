@@ -12,6 +12,13 @@ spec:
         - podSelector:
             matchLabels:
               component: meal-planner-api
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: flaresolverr
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: flaresolverr
+              app.kubernetes.io/name: flaresolverr
       ports:
         - protocol: TCP
           port: 1055
