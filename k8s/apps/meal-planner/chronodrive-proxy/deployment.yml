@@ -18,7 +18,7 @@ spec:
       automountServiceAccountToken: false
       containers:
         - name: tailscale
-          image: tailscale/tailscale:v1.98.4
+          image: tailscale/tailscale:v1.102.5
           env:
             - name: TS_AUTHKEY
               valueFrom:
