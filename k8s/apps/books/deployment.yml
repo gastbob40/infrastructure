@@ -23,7 +23,7 @@ spec:
         kubernetes.io/hostname: k8s-slave-02
       containers:
         - name: app
-          image: crocodilestick/calibre-web-automated:v4.0.6
+          image: crocodilestick/calibre-web-automated:v4.0.8
           env:
             - name: PUID
               value: '1000'
