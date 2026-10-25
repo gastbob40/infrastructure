@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: ingress-nginx
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   destination:
@@ -39,6 +41,7 @@ spec:
         
           ingressClass: public
           ingressClassResource:
+            enabled: false
             name: public
             default: true
         

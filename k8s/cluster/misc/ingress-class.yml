@@ -1,0 +1,10 @@
+# Conserver cette classe pendant le remplacement du contrôleur NGINX.
+# Le provider de compatibilité Traefik traite les Ingress public existants.
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: public
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: "true"
+spec:
+  controller: k8s.io/ingress-nginx

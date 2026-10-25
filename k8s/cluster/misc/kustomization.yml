@@ -1,3 +1,4 @@
 resources:
   - cluster-issuer.yml
   - argocd-ingress.yml
+  - ingress-class.yml

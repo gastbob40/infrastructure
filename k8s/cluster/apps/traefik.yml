@@ -56,6 +56,18 @@ spec:
             publishStatusAddress: ""
             # Nécessaire pour faire respecter proxy-body-size, comme NGINX.
             proxyRequestBuffering: true
+          file:
+            enabled: true
+            watch: true
+            content:
+              http:
+                middlewares:
+                  public-hsts:
+                    headers:
+                      stsSeconds: 31536000
+                      stsIncludeSubdomains: true
+                      stsPreload: false
+                      forceSTSHeader: false
 
         # Depuis le chart 40, le type du Service se configure sous spec.
         service:
@@ -65,11 +77,19 @@ spec:
         # 3600 s est un plafond total, distinct des timeouts d'inactivité des backends.
         ports:
           web:
+            http:
+              # Comme NGINX, ignorer les variantes de noms avec underscore ou point.
+              aliasHeadersStrategy: delete
             transport:
               respondingTimeouts:
                 readTimeout: 3600s
                 writeTimeout: 0s
           websecure:
+            http:
+              aliasHeadersStrategy: delete
+              # Préserver le HSTS que NGINX ajoutait aux réponses HTTPS.
+              middlewares:
+                - public-hsts@file
             transport:
               respondingTimeouts:
                 readTimeout: 3600s
