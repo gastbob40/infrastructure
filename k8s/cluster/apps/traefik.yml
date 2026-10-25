@@ -33,14 +33,17 @@ spec:
             operator: Exists
             effect: NoSchedule
 
-        # La classe public est gérée par cluster-misc.
+        # Les classes public (transition) et traefik sont gérées par cluster-misc.
         ingressClass:
           enabled: false
         providers:
           kubernetesCRD:
             enabled: false
           kubernetesIngress:
-            enabled: false
+            enabled: true
+            ingressClass: traefik
+            publishedService:
+              enabled: true
           kubernetesGateway:
             enabled: false
           kubernetesIngressNGINX:
@@ -67,6 +70,36 @@ spec:
                       stsIncludeSubdomains: true
                       stsPreload: false
                       forceSTSHeader: false
+                  # L'ordre sur les routes protégées doit être oauth-errors, oauth-auth.
+                  oauth-errors:
+                    errors:
+                      status:
+                        - "401"
+                      statusRewrites:
+                        "401": 302
+                      service: oauth-proxy@file
+                      query: "/oauth2/start?rd={url}"
+                  oauth-auth:
+                    forwardAuth:
+                      address: http://oauth2-proxy.oauth2-proxy.svc.cluster.local:4180/oauth2/auth
+                      trustForwardHeader: true
+                      authResponseHeaders:
+                        - X-Auth-Request-User
+                        - X-Auth-Request-Email
+                      maxResponseBodySize: 1048576
+                services:
+                  oauth-proxy:
+                    loadBalancer:
+                      servers:
+                        - url: http://oauth2-proxy.oauth2-proxy.svc.cluster.local:4180
+                serversTransports:
+                  vault-tls:
+                    serverName: vault.k8s.gastbob40.com
+                  # Argo CD présente un certificat interne auto-signé.
+                  # Cette exception reste limitée au Service Argo CD, jusqu'à
+                  # l'émission du Certificate argocd-server-tls par cert-manager.
+                  argocd-tls:
+                    insecureSkipVerify: true
 
         # Depuis le chart 40, le type du Service se configure sous spec.
         service:
@@ -79,6 +112,12 @@ spec:
             http:
               # Comme NGINX, ignorer les variantes de noms avec underscore ou point.
               aliasHeadersStrategy: delete
+              redirections:
+                entryPoint:
+                  to: websecure
+                  scheme: https
+                  # Les routes HTTP-01 de cert-manager restent prioritaires.
+                  priority: 1
             transport:
               respondingTimeouts:
                 readTimeout: 3600s
@@ -86,6 +125,8 @@ spec:
           websecure:
             http:
               aliasHeadersStrategy: delete
+              tls:
+                enabled: true
               # Préserver le HSTS que NGINX ajoutait aux réponses HTTPS.
               middlewares:
                 - public-hsts@file

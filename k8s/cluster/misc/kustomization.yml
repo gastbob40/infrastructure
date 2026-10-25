@@ -2,3 +2,5 @@ resources:
   - cluster-issuer.yml
   - argocd-ingress.yml
   - ingress-class.yml
+  - traefik-ingress-class.yml
+  - argocd-server-certificate.yml

@@ -1,0 +1,10 @@
+# Classe explicite pour les routes natives ; public reste la classe par défaut
+# jusqu'à la fin de la migration des Ingress et du solver cert-manager.
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: traefik
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: "false"
+spec:
+  controller: traefik.io/ingress-controller
