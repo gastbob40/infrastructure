@@ -4,6 +4,7 @@ kind: CronJob
 metadata:
   name: discord-presence
 spec:
+  suspend: true
   schedule: "*/5 * * * *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 1

@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   name: fraternity-api
 spec:
-  replicas: 5
+  replicas: 0
   revisionHistoryLimit: 0
   selector:
     matchLabels:
