@@ -103,13 +103,11 @@ spec:
           # Ingress configuration
           ingress:
             enabled: true
-            ingressClassName: "public"
+            ingressClassName: traefik
             annotations:
               cert-manager.io/cluster-issuer: "default-issuer"
+              traefik.ingress.kubernetes.io/router.entrypoints: websecure
               cert-manager.io/revision-history-limit: "1"
-              nginx.ingress.kubernetes.io/proxy-body-size: "4G"
-              nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
-              nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
             hosts:
               - auth.gastbob40.com
             tls:

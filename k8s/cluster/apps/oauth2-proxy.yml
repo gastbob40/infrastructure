@@ -36,6 +36,8 @@ spec:
           configFile: |-
             email_domains = [ "*" ]
             provider = "oidc"
+            reverse_proxy = true
+            set_xauthrequest = true
             oidc_issuer_url = "https://auth.gastbob40.com/application/o/oauth2-proxy/"
             scope = "openid profile email"
             redirect_url = "https://auth-proxy.k8s.gastbob40.com/oauth2/callback"
@@ -52,9 +54,10 @@ spec:
         
         ingress:
           enabled: true
-          className: "public"
+          className: traefik
           annotations:
             cert-manager.io/cluster-issuer: "default-issuer"
+            traefik.ingress.kubernetes.io/router.entrypoints: websecure
             cert-manager.io/revision-history-limit: "1"
           hosts:
             - auth-proxy.k8s.gastbob40.com

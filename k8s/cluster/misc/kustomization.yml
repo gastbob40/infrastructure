@@ -4,3 +4,4 @@ resources:
   - ingress-class.yml
   - traefik-ingress-class.yml
   - argocd-server-certificate.yml
+  - grafana-ingress.yml

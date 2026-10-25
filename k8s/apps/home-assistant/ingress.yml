@@ -6,13 +6,11 @@ metadata:
   namespace: "home-assistant"
   annotations:
     cert-manager.io/cluster-issuer: default-issuer
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
     cert-manager.io/revision-history-limit: "1"
-    # Home Assistant needs WebSocket support for the frontend
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
 
 spec:
-  ingressClassName: public
+  ingressClassName: traefik
   rules:
     - host: "ha.gastbob40.com"
       http:

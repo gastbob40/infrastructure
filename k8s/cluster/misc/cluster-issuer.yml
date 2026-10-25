@@ -12,4 +12,8 @@ spec:
     solvers:
       - http01:
           ingress:
-            ingressClassName: public
+            ingressClassName: traefik
+            ingressTemplate:
+              metadata:
+                annotations:
+                  traefik.ingress.kubernetes.io/router.entrypoints: web

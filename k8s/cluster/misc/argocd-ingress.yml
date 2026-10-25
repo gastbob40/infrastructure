@@ -6,12 +6,10 @@ metadata:
   # Allow antoine big oidc energy
   annotations:
     cert-manager.io/cluster-issuer: default-issuer
-    # Terminer le TLS public à l'Ingress, puis joindre Argo CD en HTTPS.
-    # ssl-passthrough était ignoré par NGINX et changerait le certificat sous Traefik.
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
     cert-manager.io/revision-history-limit: "1"
 spec:
-  ingressClassName: public
+  ingressClassName: traefik
   tls:
     - hosts: ["argocd.k8s.gastbob40.com"]
       secretName: argocd-server-ingress-tls

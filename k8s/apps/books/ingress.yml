@@ -6,14 +6,11 @@ metadata:
   namespace: "books"
   annotations:
     cert-manager.io/cluster-issuer: default-issuer
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
     cert-manager.io/revision-history-limit: "1"
-    # Upload d'epub en lot depuis le navigateur
-    nginx.ingress.kubernetes.io/proxy-body-size: "512m"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
 
 spec:
-  ingressClassName: public
+  ingressClassName: traefik
   rules:
     - host: "books.gastbob40.com"
       http:

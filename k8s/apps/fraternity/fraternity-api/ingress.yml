@@ -6,9 +6,10 @@ metadata:
   namespace: fraternity
   annotations:
     cert-manager.io/cluster-issuer: default-issuer
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
     cert-manager.io/revision-history-limit: "1"
 spec:
-  ingressClassName: public
+  ingressClassName: traefik
   rules:
     - host: "fraternity.gastbob40.com"
       http:

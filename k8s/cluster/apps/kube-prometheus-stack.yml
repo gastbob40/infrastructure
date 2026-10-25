@@ -90,21 +90,9 @@ spec:
                 url: https://raw.githubusercontent.com/gastbob40/infrastructure/main/dashboards/k8s-views-pods.json
                 token: ''
             
+          # Routage géré dans cluster-misc, indépendamment du chart monitoring.
           ingress:
-            enabled: true
-            ingressClassName: public
-            pathType: Prefix
-            annotations:
-              cert-manager.io/cluster-issuer: default-issuer
-              cert-manager.io/revision-history-limit: "1"
-              nginx.ingress.kubernetes.io/proxy-body-size: "4G"
-        
-            hosts:
-              - grafana.gastbob40.com
-            tls:
-              - secretName: grafana-tls-secrets
-                hosts:
-                - grafana.gastbob40.com
+            enabled: false
           grafana.ini:
             server:
               root_url: https://grafana.gastbob40.com

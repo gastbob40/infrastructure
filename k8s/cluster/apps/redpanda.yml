@@ -45,14 +45,12 @@ metadata:
   namespace: redpanda
   annotations:
     cert-manager.io/cluster-issuer: default-issuer
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.middlewares: oauth-errors@file,oauth-auth@file
     cert-manager.io/revision-history-limit: "1"
-    nginx.ingress.kubernetes.io/auth-url: "http://oauth2-proxy.oauth2-proxy.svc.cluster.local:4180/oauth2/auth"
-    # NGINX et Traefik ajoutent eux-mêmes rd avec l'URI de retour encodée.
-    nginx.ingress.kubernetes.io/auth-signin: "https://auth-proxy.k8s.gastbob40.com/oauth2/start"
-    nginx.ingress.kubernetes.io/auth-response-headers: "X-Auth-Request-User, X-Auth-Request-Email"
 
 spec:
-  ingressClassName: public
+  ingressClassName: traefik
   rules:
     - host: "kafka-console.k8s.gastbob40.com"
       http:
