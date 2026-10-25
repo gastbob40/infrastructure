@@ -15,3 +15,5 @@ spec:
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
+      # Argo CD's ApplicationSet CRD exceeds the client-side apply annotation limit.
+      - ServerSideApply=true

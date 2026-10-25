@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+data:
+  # Preserve ownership of existing resources when upgrading from Argo CD 2.x.
+  # Migrating to annotation tracking requires a separate full sync of every app.
+  application.resourceTrackingMethod: label
+  # Home Assistant's external Endpoints object is declared in Git.
+  # Keep it watched; retain the other upstream exclusions for generated resources.
+  resource.customizations.ignoreResourceUpdates.Endpoints: |
+    jsonPointers: []
+  resource.exclusions: |
+    - apiGroups:
+        - discovery.k8s.io
+      kinds:
+        - EndpointSlice
+    - apiGroups:
+        - coordination.k8s.io
+      kinds:
+        - Lease
+    - apiGroups:
+        - authentication.k8s.io
+        - authorization.k8s.io
+      kinds:
+        - SelfSubjectReview
+        - TokenReview
+        - LocalSubjectAccessReview
+        - SelfSubjectAccessReview
+        - SelfSubjectRulesReview
+        - SubjectAccessReview
+    - apiGroups:
+        - certificates.k8s.io
+      kinds:
+        - CertificateSigningRequest
+    - apiGroups:
+        - cert-manager.io
+      kinds:
+        - CertificateRequest
+    - apiGroups:
+        - cilium.io
+      kinds:
+        - CiliumIdentity
+        - CiliumEndpoint
+        - CiliumEndpointSlice
+    - apiGroups:
+        - kyverno.io
+        - reports.kyverno.io
+        - wgpolicyk8s.io
+      kinds:
+        - PolicyReport
+        - ClusterPolicyReport
+        - EphemeralReport
+        - ClusterEphemeralReport
+        - AdmissionReport
+        - ClusterAdmissionReport
+        - BackgroundScanReport
+        - ClusterBackgroundScanReport
+        - UpdateRequest

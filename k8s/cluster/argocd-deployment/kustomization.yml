@@ -2,8 +2,9 @@ namespace: argocd
 
 resources:
   - namespace.yml
-  - https://raw.githubusercontent.com/argoproj/argo-cd/v2.12.4/manifests/install.yaml
+  - https://raw.githubusercontent.com/argoproj/argo-cd/v3.5.6/manifests/install.yaml
 
-patchesStrategicMerge:
-  - argocd-deployment.yml
-  - argocd-server-service.yml
+patches:
+  - path: argocd-deployment.yml
+  - path: argocd-server-service.yml
+  - path: argocd-config.yml
