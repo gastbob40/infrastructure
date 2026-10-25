@@ -3,6 +3,9 @@ kind: Application
 metadata:
   name: argocd-deployment
   namespace: argocd
+  annotations:
+    # Use the cluster's schema for SSA diffs, including during the 2.x upgrade.
+    argocd.argoproj.io/compare-options: ServerSideDiff=true
 spec:
   project: default
   source:
