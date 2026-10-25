@@ -4,4 +4,3 @@ resources:
   - traefik-ingress-class.yml
   - argocd-server-certificate.yml
   - grafana-ingress.yml
-  - traefik-acme-validation.yml
