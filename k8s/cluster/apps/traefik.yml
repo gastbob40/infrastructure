@@ -1,5 +1,4 @@
 # Contrôleur d'entrée public, géré par Argo CD indépendamment de K3s.
-# La compatibilité NGINX conserve temporairement les routes existantes.
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -20,11 +19,6 @@ spec:
         deployment:
           replicas: 2
           revisionHistoryLimit: 2
-          # Les limites d'upload existantes vont jusqu'à 4 GiB.
-          # emptyDir utilise le disque du nœud, pas la mémoire ni un PVC.
-          tmpVolume:
-            emptyDir:
-              sizeLimit: 8Gi
 
         nodeSelector:
           kubernetes.io/hostname: k8s-master
@@ -33,7 +27,7 @@ spec:
             operator: Exists
             effect: NoSchedule
 
-        # Les classes public (transition) et traefik sont gérées par cluster-misc.
+        # La classe traefik est gérée par cluster-misc.
         ingressClass:
           enabled: false
         providers:
@@ -47,17 +41,7 @@ spec:
           kubernetesGateway:
             enabled: false
           kubernetesIngressNGINX:
-            enabled: true
-            controllerClass: k8s.io/ingress-nginx
-            ingressClass: public
-            ingressClassByName: false
-            watchIngressWithoutClass: false
-            # Publier les adresses du ServiceLB Traefik après la bascule.
-            publishService:
-              enabled: true
-            publishStatusAddress: ""
-            # Nécessaire pour faire respecter proxy-body-size, comme NGINX.
-            proxyRequestBuffering: true
+            enabled: false
           file:
             enabled: true
             watch: true
@@ -95,11 +79,8 @@ spec:
                 serversTransports:
                   vault-tls:
                     serverName: vault.k8s.gastbob40.com
-                  # Argo CD présente un certificat interne auto-signé.
-                  # Cette exception reste limitée au Service Argo CD, jusqu'à
-                  # l'émission du Certificate argocd-server-tls par cert-manager.
                   argocd-tls:
-                    insecureSkipVerify: true
+                    serverName: argocd.k8s.gastbob40.com
 
         # Depuis le chart 40, le type du Service se configure sous spec.
         service:
@@ -110,7 +91,7 @@ spec:
         ports:
           web:
             http:
-              # Comme NGINX, ignorer les variantes de noms avec underscore ou point.
+              # Supprimer les alias d’en-têtes ambigus avec underscore ou point.
               aliasHeadersStrategy: delete
               redirections:
                 entryPoint:
@@ -127,7 +108,7 @@ spec:
               aliasHeadersStrategy: delete
               tls:
                 enabled: true
-              # Préserver le HSTS que NGINX ajoutait aux réponses HTTPS.
+              # Activer HSTS uniquement sur HTTPS.
               middlewares:
                 - public-hsts@file
             transport:
@@ -146,10 +127,8 @@ spec:
           requests:
             cpu: 100m
             memory: 128Mi
-            ephemeral-storage: 1Gi
           limits:
             memory: 512Mi
-            ephemeral-storage: 10Gi
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
