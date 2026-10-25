@@ -1,0 +1,96 @@
+# Phase de validation : accès par port-forward uniquement, NGINX garde le trafic.
+# Synchroniser d'abord cluster-misc (TLS Argo CD) et l'Ingress Redpanda (retour OAuth).
+# Ne passer à LoadBalancer qu'après les tests et la libération de 80/443 par NGINX.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: traefik
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: traefik
+    name: in-cluster
+  source:
+    repoURL: https://traefik.github.io/charts
+    chart: traefik
+    targetRevision: 42.1.3
+    helm:
+      skipCrds: true
+      values: |
+        deployment:
+          replicas: 2
+          revisionHistoryLimit: 2
+          # Les limites d'upload existantes vont jusqu'à 4 GiB.
+          # emptyDir utilise le disque du nœud, pas la mémoire ni un PVC.
+          tmpVolume:
+            emptyDir:
+              sizeLimit: 8Gi
+
+        nodeSelector:
+          kubernetes.io/hostname: k8s-master
+        tolerations:
+          - key: node-role.kubernetes.io/master
+            operator: Exists
+            effect: NoSchedule
+
+        # La classe public existante reste gérée par NGINX pendant les tests.
+        ingressClass:
+          enabled: false
+        providers:
+          kubernetesCRD:
+            enabled: false
+          kubernetesIngress:
+            enabled: false
+          kubernetesGateway:
+            enabled: false
+          kubernetesIngressNGINX:
+            enabled: true
+            controllerClass: k8s.io/ingress-nginx
+            ingressClass: public
+            ingressClassByName: false
+            watchIngressWithoutClass: false
+            # Évite que deux contrôleurs publient des adresses concurrentes.
+            publishService:
+              enabled: false
+            publishStatusAddress: ""
+            # Nécessaire pour faire respecter proxy-body-size, comme NGINX.
+            proxyRequestBuffering: true
+
+        # Depuis le chart 40, le type du Service se configure sous spec.
+        service:
+          spec:
+            type: ClusterIP
+        # Le défaut Traefik (60 s pour lire tout le corps) écourterait les gros uploads.
+        # 3600 s est un plafond total, distinct des timeouts d'inactivité des backends.
+        ports:
+          web:
+            transport:
+              respondingTimeouts:
+                readTimeout: 3600s
+                writeTimeout: 0s
+          websecure:
+            transport:
+              respondingTimeouts:
+                readTimeout: 3600s
+                writeTimeout: 0s
+        api:
+          dashboard: false
+        ingressRoute:
+          dashboard:
+            enabled: false
+        log:
+          format: json
+          level: INFO
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+            ephemeral-storage: 1Gi
+          limits:
+            memory: 512Mi
+            ephemeral-storage: 10Gi
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+  revisionHistoryLimit: 2

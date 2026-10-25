@@ -6,7 +6,8 @@ metadata:
   # Allow antoine big oidc energy
   annotations:
     cert-manager.io/cluster-issuer: default-issuer
-    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    # Terminer le TLS public à l'Ingress, puis joindre Argo CD en HTTPS.
+    # ssl-passthrough était ignoré par NGINX et changerait le certificat sous Traefik.
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     cert-manager.io/revision-history-limit: "1"
 spec:
