@@ -49,6 +49,7 @@ spec:
           
           extraArgs:
             profiler-port: 0
+            update-status: "false"
           
           config:
             allow-snippet-annotations: "true"
@@ -60,4 +61,4 @@ spec:
             enable-real-ip: "true"
             proxy-add-original-uri-header: "true"
           service:
-            type: LoadBalancer
+            type: ClusterIP

@@ -1,6 +1,5 @@
-# Phase de validation : accès par port-forward uniquement, NGINX garde le trafic.
-# Synchroniser d'abord cluster-misc (TLS Argo CD) et l'Ingress Redpanda (retour OAuth).
-# Ne passer à LoadBalancer qu'après les tests et la libération de 80/443 par NGINX.
+# Contrôleur d'entrée public, géré par Argo CD indépendamment de K3s.
+# La compatibilité NGINX conserve temporairement les routes existantes.
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -34,7 +33,7 @@ spec:
             operator: Exists
             effect: NoSchedule
 
-        # La classe public existante reste gérée par NGINX pendant les tests.
+        # La classe public est gérée par cluster-misc.
         ingressClass:
           enabled: false
         providers:
@@ -50,9 +49,9 @@ spec:
             ingressClass: public
             ingressClassByName: false
             watchIngressWithoutClass: false
-            # Évite que deux contrôleurs publient des adresses concurrentes.
+            # Publier les adresses du ServiceLB Traefik après la bascule.
             publishService:
-              enabled: false
+              enabled: true
             publishStatusAddress: ""
             # Nécessaire pour faire respecter proxy-body-size, comme NGINX.
             proxyRequestBuffering: true
@@ -72,7 +71,7 @@ spec:
         # Depuis le chart 40, le type du Service se configure sous spec.
         service:
           spec:
-            type: ClusterIP
+            type: LoadBalancer
         # Le défaut Traefik (60 s pour lire tout le corps) écourterait les gros uploads.
         # 3600 s est un plafond total, distinct des timeouts d'inactivité des backends.
         ports:
