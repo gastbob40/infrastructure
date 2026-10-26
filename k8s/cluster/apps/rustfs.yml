@@ -205,7 +205,6 @@ spec:
             cert-manager.io/cluster-issuer: default-issuer
             cert-manager.io/revision-history-limit: "1"
             traefik.ingress.kubernetes.io/router.entrypoints: websecure
-            traefik.ingress.kubernetes.io/router.middlewares: rustfs-console@file
           hosts:
             - host: api.s3.gastbob40.com
               paths:

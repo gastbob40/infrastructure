@@ -47,6 +47,14 @@ spec:
             watch: true
             content:
               http:
+                routers:
+                  rustfs-console-home:
+                    rule: 'Host(`s3.gastbob40.com`) && Path(`/`) && Method(`GET`) && HeaderRegexp(`Accept`, `text/html`)'
+                    entryPoints: [websecure]
+                    priority: 1000
+                    middlewares: [rustfs-console]
+                    service: noop@internal
+                    tls: {}
                 middlewares:
                   rustfs-console:
                     redirectRegex:
