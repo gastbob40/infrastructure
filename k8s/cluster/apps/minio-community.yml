@@ -45,6 +45,7 @@ spec:
           tag: "RELEASE.2025-09-07T16-13-09Z"
         
         existingSecret: "minio-community-secrets"
+        users: []
         
         environment:
           MINIO_BROWSER_REDIRECT_URL: "https://s3.gastbob40.com"
