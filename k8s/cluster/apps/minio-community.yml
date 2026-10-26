@@ -53,6 +53,8 @@ spec:
         
         persistence:
           enabled: true
+          annotations:
+            argocd.argoproj.io/sync-options: Prune=false,Delete=false
           storageClass: ""
           accessMode: ReadWriteOnce
           size: 50Gi
