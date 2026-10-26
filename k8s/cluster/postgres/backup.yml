@@ -5,7 +5,6 @@ metadata:
   name: pg-backup
   namespace: postgres
 spec:
-  suspend: true
   schedule: "0 2 * * *"
   successfulJobsHistoryLimit: 0
   failedJobsHistoryLimit: 0
