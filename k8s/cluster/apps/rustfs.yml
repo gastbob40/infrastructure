@@ -38,6 +38,10 @@ spec:
         secret:
           existingSecret: rustfs-credentials
         extraEnv:
+          # Meal Planner envoie ses images depuis le navigateur via des URL
+          # présignées PUT. MinIO autorisait cette origine globalement.
+          - name: RUSTFS_CORS_ALLOWED_ORIGINS
+            value: https://meal-planner.gastbob40.com
           - name: RUSTFS_ACCESS_KEY
             valueFrom:
               secretKeyRef:

@@ -27,6 +27,13 @@ commandes de copie ci-dessous : les inventorier séparément et arrêter la
 migration si de tels usages apparaissent. Ne pas copier directement le répertoire
 de données MinIO dans le volume RustFS.
 
+Bien qu'aucun CORS ne soit configuré sur les buckets, MinIO répond aux preflights
+du navigateur avec son CORS global. RustFS utilise donc
+`RUSTFS_CORS_ALLOWED_ORIGINS=https://meal-planner.gastbob40.com`, configuré dans
+le manifest ArgoCD, pour préserver les uploads par URL présignée du frontend.
+Tester le preflight `OPTIONS` puis le `PUT` signé depuis cette origine avant la
+bascule publique. Les autres origines ne sont pas autorisées par ce réglage.
+
 ## 1. Déployer par Git et ArgoCD
 
 1. Faire relire puis fusionner l'ajout de l'application RustFS.
