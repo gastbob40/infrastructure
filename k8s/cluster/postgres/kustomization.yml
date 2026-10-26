@@ -8,4 +8,3 @@ resources:
   - backup.yml
   - glacier.yml
   - secrets.yml
-  - backup-validation.yml
