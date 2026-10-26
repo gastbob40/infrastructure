@@ -65,7 +65,7 @@ spec:
           port: "9001"
         
         ingress:
-          enabled: true
+          enabled: false
           ingressClassName: traefik
           annotations:
             cert-manager.io/cluster-issuer: default-issuer
@@ -79,7 +79,7 @@ spec:
                 - api.s3.gastbob40.com
         
         consoleIngress:
-          enabled: true
+          enabled: false
           ingressClassName: traefik
           annotations:
             cert-manager.io/cluster-issuer: default-issuer
