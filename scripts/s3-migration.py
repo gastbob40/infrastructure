@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
-"""Migration manuelle MinIO -> RustFS via deux port-forwards locaux.
+"""Copy MinIO to RustFS using kubectl, rclone and Python 3.
 
-Prérequis : kubectl, rclone, Python 3. Garder les tunnels locaux ouverts :
-MinIO service/minio-community (namespace minio-community), 19000:9000 ;
-RustFS service/rustfs-svc (namespace rustfs), 19010:9000.
-Effectuer plan, copy puis check avant toute bascule. Pour la copie finale,
-arrêter tous les producteurs, relire sync-plan puis lancer sync --writers-stopped.
-Les secrets restent en mémoire ; aucun appel ne modifie Kubernetes ou MinIO.
+Keep local port-forwards open: minio-community/service/minio-community at
+19000:9000 and rustfs/service/rustfs-svc at 19010:9000.
+Run plan, copy, then check. Before final sync, stop all writers and review
+sync-plan. Credentials stay in memory; Kubernetes and MinIO are never modified.
 """
 
 import argparse
@@ -39,8 +37,7 @@ def credentials(namespace, secret):
 
 
 def environment():
-    # Écarter toute configuration rclone/AWS héritée (filtres, dry-run,
-    # authentification, proxy, etc.) qui pourrait fausser la vérification.
+    # Inherited settings could silently filter data or invalidate verification.
     env = {key: value for key, value in os.environ.items()
            if not key.startswith(("RCLONE_", "AWS_"))
            and key.lower() not in ("http_proxy", "https_proxy", "all_proxy")}
@@ -65,13 +62,11 @@ def commands(action, bucket):
         return [common + ["check", source, destination, "--download"]]
     operation = "sync" if action in ("sync-plan", "sync") else "copy"
     args = [operation, source, destination, "--metadata", "--ignore-times"]
-    # Refaire la copie intégrale est peu coûteux ici (~1,3 Gio) et reprend
-    # aussi une métadonnée modifiée sans changement du contenu.
+    # Full copies (~1.3 GiB) also capture metadata-only changes.
     if action in ("plan", "sync-plan"):
         return [common + args + ["--dry-run"]]
     result = [common + ["mkdir", destination]]
     if operation == "sync":
-        # Supprimer les objets surnuméraires seulement après les transferts.
         args.append("--delete-after")
     return result + [common + args]
 
@@ -98,6 +93,6 @@ if __name__ == "__main__":
     try:
         main()
     except (subprocess.CalledProcessError, KeyError, ValueError) as exc:
-        # Ne pas imprimer de réponse de Secret ou l'environnement du processus.
+        # Never log Secret responses or the process environment.
         print(f"Migration interrompue ({type(exc).__name__}). Aucune bascule effectuée.", file=sys.stderr)
         sys.exit(1)

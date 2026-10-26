@@ -33,13 +33,9 @@ spec:
             repository: busybox
             tag: "1.37.0"
 
-        # Les clients gardent leurs identifiants pendant la migration.
-        # Le Secret est créé par Vault Secrets Operator, jamais par Helm.
         secret:
           existingSecret: rustfs-credentials
         extraEnv:
-          # Le CORS des buckets est configuré par le hook PostSync ci-dessous.
-          # La variable globale ne reconnaît pas https://*.gastbob40.com.
           - name: RUSTFS_ACCESS_KEY
             valueFrom:
               secretKeyRef:
@@ -62,6 +58,7 @@ spec:
                 - rootUser
                 - rootPassword
               type: Opaque
+          # Bucket CORS supports subdomain wildcards; the global setting does not.
           - apiVersion: v1
             kind: ConfigMap
             metadata:
@@ -77,8 +74,6 @@ spec:
                     "MaxAgeSeconds": 3600
                   }]
                 }
-          # Rejoué à chaque synchronisation complète, après disponibilité de
-          # RustFS et du Secret. Ne modifie que la configuration des buckets.
           - apiVersion: batch/v1
             kind: Job
             metadata:
@@ -162,7 +157,6 @@ spec:
           rustfs:
             region: us-east-1
             obs_environment: production
-            # Logs sur stdout ; pas de second PVC pour les logs.
             obs_log_directory: ""
 
         serviceAccount:
@@ -202,8 +196,6 @@ spec:
           timeoutSeconds: 5
           failureThreshold: 6
 
-        # Phase 1 : accès uniquement par port-forward. Aucun changement DNS.
-        # Activer via Git/ArgoCD seulement après vérification des nouveaux DNS.
         ingress:
           enabled: false
           className: traefik
