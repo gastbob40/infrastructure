@@ -38,10 +38,8 @@ spec:
         secret:
           existingSecret: rustfs-credentials
         extraEnv:
-          # Meal Planner envoie ses images depuis le navigateur via des URL
-          # présignées PUT. MinIO autorisait cette origine globalement.
-          - name: RUSTFS_CORS_ALLOWED_ORIGINS
-            value: https://meal-planner.gastbob40.com
+          # Le CORS des buckets est configuré par le hook PostSync ci-dessous.
+          # La variable globale ne reconnaît pas https://*.gastbob40.com.
           - name: RUSTFS_ACCESS_KEY
             valueFrom:
               secretKeyRef:
@@ -64,6 +62,101 @@ spec:
                 - rootUser
                 - rootPassword
               type: Opaque
+          - apiVersion: v1
+            kind: ConfigMap
+            metadata:
+              name: rustfs-bucket-cors
+            data:
+              cors.json: |
+                {
+                  "CORSRules": [{
+                    "AllowedOrigins": ["https://*.gastbob40.com"],
+                    "AllowedMethods": ["GET", "HEAD", "PUT", "POST", "DELETE"],
+                    "AllowedHeaders": ["*"],
+                    "ExposeHeaders": ["ETag"],
+                    "MaxAgeSeconds": 3600
+                  }]
+                }
+          # Rejoué à chaque synchronisation complète, après disponibilité de
+          # RustFS et du Secret. Ne modifie que la configuration des buckets.
+          - apiVersion: batch/v1
+            kind: Job
+            metadata:
+              name: rustfs-bucket-cors
+              annotations:
+                argocd.argoproj.io/hook: PostSync
+                argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
+            spec:
+              backoffLimit: 2
+              activeDeadlineSeconds: 300
+              template:
+                spec:
+                  restartPolicy: Never
+                  automountServiceAccountToken: false
+                  securityContext:
+                    runAsNonRoot: true
+                    runAsUser: 1000
+                    runAsGroup: 1000
+                    seccompProfile:
+                      type: RuntimeDefault
+                  containers:
+                    - name: configure-cors
+                      image: public.ecr.aws/aws-cli/aws-cli:2.38.5
+                      command: [/bin/sh, -ec]
+                      args:
+                        - |
+                          for bucket in meal-planner postgres-backups; do
+                            if ! aws s3api head-bucket --bucket "$bucket" >/dev/null 2>&1; then
+                              aws s3api create-bucket --bucket "$bucket"
+                            fi
+                            aws s3api put-bucket-cors --bucket "$bucket" \
+                              --cors-configuration file:///config/cors.json
+                            echo "CORS configuré : $bucket"
+                          done
+                      env:
+                        - name: AWS_ENDPOINT_URL
+                          value: http://rustfs-svc:9000
+                        - name: AWS_DEFAULT_REGION
+                          value: us-east-1
+                        - name: AWS_EC2_METADATA_DISABLED
+                          value: "true"
+                        - name: AWS_PAGER
+                          value: ""
+                        - name: AWS_ACCESS_KEY_ID
+                          valueFrom:
+                            secretKeyRef:
+                              name: rustfs-credentials
+                              key: rootUser
+                        - name: AWS_SECRET_ACCESS_KEY
+                          valueFrom:
+                            secretKeyRef:
+                              name: rustfs-credentials
+                              key: rootPassword
+                      securityContext:
+                        allowPrivilegeEscalation: false
+                        readOnlyRootFilesystem: true
+                        capabilities:
+                          drop: [ALL]
+                      resources:
+                        requests:
+                          cpu: 50m
+                          memory: 128Mi
+                        limits:
+                          cpu: 500m
+                          memory: 256Mi
+                      volumeMounts:
+                        - name: cors
+                          mountPath: /config
+                          readOnly: true
+                        - name: tmp
+                          mountPath: /tmp
+                  volumes:
+                    - name: cors
+                      configMap:
+                        name: rustfs-bucket-cors
+                    - name: tmp
+                      emptyDir:
+                        sizeLimit: 16Mi
 
         config:
           rustfs:

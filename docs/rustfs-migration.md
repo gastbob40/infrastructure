@@ -28,19 +28,30 @@ migration si de tels usages apparaissent. Ne pas copier directement le répertoi
 de données MinIO dans le volume RustFS.
 
 Bien qu'aucun CORS ne soit configuré sur les buckets, MinIO répond aux preflights
-du navigateur avec son CORS global. RustFS utilise donc
-`RUSTFS_CORS_ALLOWED_ORIGINS=https://meal-planner.gastbob40.com`, configuré dans
-le manifest ArgoCD, pour préserver les uploads par URL présignée du frontend.
-Tester le preflight `OPTIONS` puis le `PUT` signé depuis cette origine avant la
-bascule publique. Les autres origines ne sont pas autorisées par ce réglage.
+du navigateur avec son CORS global. Dans RustFS 1.0.4, la variable globale
+`RUSTFS_CORS_ALLOWED_ORIGINS` accepte des origines exactes ou `*`, mais pas les
+wildcards de sous-domaines. Le CORS des buckets les accepte : le manifest ArgoCD
+déclare donc `AllowedOrigins: ["https://*.gastbob40.com"]` dans un ConfigMap.
+Un Job `PostSync` crée les deux buckets si nécessaire et applique cette règle
+à chaque synchronisation complète de RustFS, avec les identifiants du Secret
+Vault existant. Il ne copie et ne supprime aucun objet. Les nouveaux buckets
+doivent être ajoutés explicitement à la liste du Job pour recevoir cette règle.
+
+Cela autorise les sous-domaines HTTPS, y compris imbriqués, mais pas le domaine
+nu, HTTP ou les origines externes. Le CORS n'accorde aucun droit S3 : les requêtes
+restent authentifiées ou présignées. Tester le preflight `OPTIONS` puis un `PUT`
+et un `GET` signés depuis plusieurs sous-domaines, ainsi que le refus d'une
+origine externe et d'un domaine ressemblant, avant la bascule publique.
 
 ## 1. Déployer par Git et ArgoCD
 
-1. Faire relire puis fusionner l'ajout de l'application RustFS.
+1. Valider les manifests puis pousser le changement directement sur `main`.
 2. Synchroniser `cluster-app` dans ArgoCD : il découvre `rustfs.yml`.
 3. Synchroniser ensuite l'application `rustfs` et attendre `Synced / Healthy`.
    Sa synchronisation est manuelle, comme celle de plusieurs composants du dépôt.
 4. Vérifier le PVC, le Secret matérialisé par Vault Secrets Operator et les sondes.
+5. Vérifier que le hook `rustfs-bucket-cors` a réussi. Une synchronisation
+   sélective des seules ressources de l'application RustFS ne lance pas ce hook.
 
 ```sh
 kubectl --context k8s.gastbob40.com -n rustfs get deployment,pods,pvc,svc,vaultsecret
