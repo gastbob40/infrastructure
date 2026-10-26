@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 """Migration manuelle MinIO -> RustFS via deux port-forwards locaux.
 
-Prérequis : kubectl, rclone, Python 3. Voir docs/rustfs-migration.md.
+Prérequis : kubectl, rclone, Python 3. Garder les tunnels locaux ouverts :
+MinIO service/minio-community (namespace minio-community), 19000:9000 ;
+RustFS service/rustfs-svc (namespace rustfs), 19010:9000.
+Effectuer plan, copy puis check avant toute bascule. Pour la copie finale,
+arrêter tous les producteurs, relire sync-plan puis lancer sync --writers-stopped.
 Les secrets restent en mémoire ; aucun appel ne modifie Kubernetes ou MinIO.
 """
 
