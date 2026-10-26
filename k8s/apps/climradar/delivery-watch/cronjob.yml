@@ -17,7 +17,7 @@ spec:
           restartPolicy: OnFailure
           containers:
             - name: watch
-              image: python:3.14-slim
+              image: python:3.15-slim
               command: ["python3", "/scripts/watch.py"]
               env:
                 # Offre ManoMano surveillée (deliveryPromise GraphQL)
