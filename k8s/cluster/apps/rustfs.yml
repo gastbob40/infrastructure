@@ -50,19 +50,6 @@ spec:
                 - rootUser
                 - rootPassword
               type: Opaque
-          - apiVersion: cert-manager.io/v1
-            kind: Certificate
-            metadata:
-              name: rustfs-tls
-            spec:
-              secretName: rustfs-tls
-              revisionHistoryLimit: 1
-              dnsNames:
-                - api.s3.gastbob40.com
-                - s3.gastbob40.com
-              issuerRef:
-                name: default-issuer
-                kind: ClusterIssuer
           # Bucket CORS supports subdomain wildcards; the global setting does not.
           - apiVersion: v1
             kind: ConfigMap
@@ -212,10 +199,13 @@ spec:
           failureThreshold: 6
 
         ingress:
-          enabled: false
+          enabled: true
           className: traefik
           annotations:
+            cert-manager.io/cluster-issuer: default-issuer
+            cert-manager.io/revision-history-limit: "1"
             traefik.ingress.kubernetes.io/router.entrypoints: websecure
+            traefik.ingress.kubernetes.io/router.middlewares: rustfs-console@file
           hosts:
             - host: api.s3.gastbob40.com
               paths:
@@ -230,10 +220,7 @@ spec:
           tls:
             enabled: true
             certManager:
-              enabled: false
-            existingSecret:
               enabled: true
-              name: rustfs-tls
   syncPolicy:
     syncOptions:
       - CreateNamespace=true

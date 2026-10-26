@@ -48,6 +48,11 @@ spec:
             content:
               http:
                 middlewares:
+                  rustfs-console:
+                    redirectRegex:
+                      regex: '^https://s3\.gastbob40\.com/?$'
+                      replacement: https://s3.gastbob40.com/rustfs/console/
+                      permanent: true
                   public-hsts:
                     headers:
                       stsSeconds: 31536000
