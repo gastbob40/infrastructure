@@ -25,14 +25,6 @@ spec:
           distributed:
             enabled: false
 
-        image:
-          rustfs:
-            repository: rustfs/rustfs
-            tag: "1.0.4"
-          initImage:
-            repository: busybox
-            tag: "1.37.0"
-
         secret:
           existingSecret: rustfs-credentials
         extraEnv:
@@ -58,6 +50,19 @@ spec:
                 - rootUser
                 - rootPassword
               type: Opaque
+          - apiVersion: cert-manager.io/v1
+            kind: Certificate
+            metadata:
+              name: rustfs-tls
+            spec:
+              secretName: rustfs-tls
+              revisionHistoryLimit: 1
+              dnsNames:
+                - api.s3.gastbob40.com
+                - s3.gastbob40.com
+              issuerRef:
+                name: default-issuer
+                kind: ClusterIssuer
           # Bucket CORS supports subdomain wildcards; the global setting does not.
           - apiVersion: v1
             kind: ConfigMap
@@ -74,6 +79,14 @@ spec:
                     "MaxAgeSeconds": 3600
                   }]
                 }
+              apply-cors.sh: |
+                set -eu
+                buckets="$(aws s3api list-buckets --query 'Buckets[].Name' --output text)"
+                for bucket in $buckets; do
+                  aws s3api put-bucket-cors --bucket "$bucket" \
+                    --cors-configuration file:///config/cors.json
+                  echo "CORS configured: $bucket"
+                done
           - apiVersion: batch/v1
             kind: Job
             metadata:
@@ -81,7 +94,7 @@ spec:
               annotations:
                 argocd.argoproj.io/hook: PostSync
                 argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
-            spec:
+            spec: &corsJobSpec
               backoffLimit: 2
               activeDeadlineSeconds: 300
               template:
@@ -97,17 +110,7 @@ spec:
                   containers:
                     - name: configure-cors
                       image: public.ecr.aws/aws-cli/aws-cli:2.38.5
-                      command: [/bin/sh, -ec]
-                      args:
-                        - |
-                          for bucket in meal-planner postgres-backups; do
-                            if ! aws s3api head-bucket --bucket "$bucket" >/dev/null 2>&1; then
-                              aws s3api create-bucket --bucket "$bucket"
-                            fi
-                            aws s3api put-bucket-cors --bucket "$bucket" \
-                              --cors-configuration file:///config/cors.json
-                            echo "CORS configuré : $bucket"
-                          done
+                      command: [/bin/sh, /config/apply-cors.sh]
                       env:
                         - name: AWS_ENDPOINT_URL
                           value: http://rustfs-svc:9000
@@ -152,6 +155,18 @@ spec:
                     - name: tmp
                       emptyDir:
                         sizeLimit: 16Mi
+          - apiVersion: batch/v1
+            kind: CronJob
+            metadata:
+              name: rustfs-bucket-cors
+            spec:
+              schedule: "* * * * *"
+              concurrencyPolicy: Forbid
+              startingDeadlineSeconds: 60
+              successfulJobsHistoryLimit: 1
+              failedJobsHistoryLimit: 1
+              jobTemplate:
+                spec: *corsJobSpec
 
         config:
           rustfs:
@@ -200,16 +215,14 @@ spec:
           enabled: false
           className: traefik
           annotations:
-            cert-manager.io/cluster-issuer: default-issuer
-            cert-manager.io/revision-history-limit: "1"
             traefik.ingress.kubernetes.io/router.entrypoints: websecure
           hosts:
-            - host: api.s3-next.gastbob40.com
+            - host: api.s3.gastbob40.com
               paths:
                 - path: /
                   pathType: Prefix
                   servicePort: endpoint
-            - host: s3-next.gastbob40.com
+            - host: s3.gastbob40.com
               paths:
                 - path: /
                   pathType: Prefix
@@ -217,7 +230,10 @@ spec:
           tls:
             enabled: true
             certManager:
+              enabled: false
+            existingSecret:
               enabled: true
+              name: rustfs-tls
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
