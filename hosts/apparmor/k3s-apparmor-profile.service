@@ -1,0 +1,15 @@
+# Managed by infrastructure/hosts/apparmor.
+[Unit]
+Description=Load containerd AppArmor profile with Ubuntu stacked-peer compatibility
+Requires=apparmor.service
+After=apparmor.service
+Before=k3s.service k3s-agent.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/apparmor_parser -Kr /etc/apparmor.d/cri-containerd.apparmor.d
+ExecReload=/usr/sbin/apparmor_parser -Kr /etc/apparmor.d/cri-containerd.apparmor.d
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
