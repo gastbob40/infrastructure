@@ -119,13 +119,16 @@ print(json.dumps({"host":run("hostname"), "service":service, "profile":"enforce"
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("host", choices=("k8s-s2", "k8s-s1", "k8s"))
+    parser.add_argument("host", help="SSH destination configured locally")
+    parser.add_argument("--sudo", action="store_true", help="Run the remote installer with sudo -n")
     args = parser.parse_args()
+    if args.host.startswith("-") or any(c.isspace() for c in args.host):
+        parser.error("host must be a single SSH destination, not an option")
     directory = Path(__file__).resolve().parent
     names = ("cri-containerd.apparmor.d", "k3s-apparmor-profile.service", "k3s-apparmor-profile.conf")
     payload = base64.b64encode(json.dumps({n: (directory / n).read_text() for n in names}).encode()).decode()
     code = "import base64,json\nbundle=json.loads(base64.b64decode(" + repr(payload) + "))\n" + REMOTE
-    command = "python3 -" if args.host == "k8s" else "sudo -n python3 -"
+    command = "sudo -n python3 -" if args.sudo else "python3 -"
     subprocess.run(["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=10", args.host, command],
                    input=code, text=True, check=True)
 

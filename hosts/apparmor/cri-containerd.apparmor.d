@@ -18,7 +18,7 @@ profile cri-containerd.apparmor.d flags=(attach_disconnected,mediate_deleted) {
   signal (receive) peer=unconfined,
   signal (receive) peer=runc,
   signal (receive) peer=crun,
-  # The containerd daemon runs unconfined on these three nodes.
+  # The installer checks that the containerd daemon runs unconfined.
   signal (receive) peer=unconfined,
   signal (send,receive) peer=cri-containerd.apparmor.d,
   # Ubuntu can stack the unconfined label onto this same profile.

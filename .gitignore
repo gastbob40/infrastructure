@@ -3,3 +3,6 @@ __pycache__/
 *.tfstate
 .terraform
 .terraform.lock.hcl
+
+# Private local operational notes
+/.local/
