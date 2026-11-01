@@ -18,3 +18,21 @@ contourner ce problème.
 
 Références : [incident containerd #14485](https://github.com/containerd/containerd/issues/14485),
 [correctif proposé #14487](https://github.com/containerd/containerd/pull/14487).
+
+## FlareSolverr / Chromium — 1er novembre 2026
+
+Le contournement couvre aussi le label exact
+`chromium//&cri-containerd.apparmor.d` : signaux et lecture des informations
+de processus (`ptrace read/readby`, sans `trace`). Les requêtes FlareSolverr
+réussissaient mais la fermeture des navigateurs échouait, laissant des
+processus en mémoire même après `sessions.destroy`.
+
+Après application sur les trois nœuds et relance du seul pod FlareSolverr,
+les tests de navigation et de sessions ne laissent plus de navigateur
+actif ni de refus AppArmor Chromium. Un simple statut HTTP 200 ou une liste
+de sessions vide ne suffisent donc pas à valider le nettoyage.
+
+Meal Planner utilise actuellement le proxy résidentiel pour HelloFresh,
+sans FlareSolverr. Conserver ce chemin fonctionnel. Le test FlareSolverr
+direct vers HelloFresh reste bloqué par Cloudflare ; une future intégration
+devra aussi prévoir le passage par le proxy et ses permissions réseau.

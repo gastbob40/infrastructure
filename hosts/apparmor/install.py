@@ -65,9 +65,11 @@ if not unchanged:
         else:
             previous[str(path)] = None
     (backup / "previous-files.json").write_text(json.dumps(previous, indent=2) + "\n")
+    stacked_peers = ("peer=cri-containerd.apparmor.d//&unconfined,",
+                     "peer=chromium//&cri-containerd.apparmor.d,")
     original = "\n".join(line for line in bundle["cri-containerd.apparmor.d"].splitlines()
-                         if "peer=cri-containerd.apparmor.d//&unconfined," not in line) + "\n"
-    # Reconstructed pinned runtime default, with only the two workaround rules removed.
+                         if not any(peer in line for peer in stacked_peers)) + "\n"
+    # Reconstruct the pinned runtime default with all workaround rules removed.
     (backup / "runtime-default-before.profile").write_text(original)
     (backup / "previous-unit-state.json").write_text(json.dumps({"enabled": enabled_before}) + "\n")
 

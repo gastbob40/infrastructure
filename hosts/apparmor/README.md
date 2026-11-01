@@ -13,16 +13,20 @@ containerd `v2.3.4-k3s1.36`, AppArmor 5.0.2 ; noyau `7.0.0-42-generic`
 sur le master et `7.0.0-1015-oracle` sur les deux slaves.
 
 Le profil reprend celui de la [version exacte de containerd installée](https://github.com/k3s-io/containerd/blob/v2.3.4-k3s1.36/contrib/apparmor/template.go).
-Seules deux autorisations sont ajoutées pour ce label empilé précis :
-les signaux et `ptrace`. Toutes les restrictions du profil d'origine
-restent présentes. AppArmor reste en mode `enforce` et
+Deux autorisations sont ajoutées pour ce label empilé précis :
+les signaux et `ptrace`. Depuis le 1er novembre, deux autres autorisations
+ciblent le label exact `chromium//&cri-containerd.apparmor.d` : les signaux
+et `ptrace (read,readby)` uniquement, pour la fermeture des navigateurs et
+la lecture des informations de processus. L'accès `ptrace trace/tracedby`
+n'est pas ajouté pour ce label Chromium. Toutes les restrictions du profil
+d'origine restent présentes. Le profil containerd reste en mode `enforce` et
 `kernel.apparmor_restrict_unprivileged_unconfined` reste à `1`.
 
 Suivi amont : [incident #14485](https://github.com/containerd/containerd/issues/14485)
 et [proposition de correctif #14487](https://github.com/containerd/containerd/pull/14487).
 Il s'agit d'un contournement local temporaire, à réexaminer avant toute
-mise à jour K3s/containerd. Les autres labels empilés, notamment ceux de
-Chromium, ne sont pas autorisés par ces deux règles.
+mise à jour K3s/containerd. Aucun joker n'élargit ces exceptions à d'autres
+labels empilés.
 
 ## Installation
 
@@ -92,10 +96,40 @@ Meal Planner a validé ses 11 migrations et son endpoint
 Les trois serveurs et trois workers Authentik sont ensuite redevenus
 disponibles ; `https://auth.gastbob40.com/-/health/ready/` répondait HTTP 200.
 
-Un cas distinct reste à surveiller dans les journaux du master : des refus
-`ptrace read` pour `chromium//&cri-containerd.apparmor.d`, provenant de
-FlareSolverr. Le contournement n'élargit pas les permissions à ce label ;
-ces traces ne suffisent pas à conclure à une panne de FlareSolverr.
+## FlareSolverr : fermeture des navigateurs corrigée le 1er novembre
+
+FlareSolverr 3.4.6 / Chromium 142 pouvait charger une page et répondre
+`status=ok` malgré les refus AppArmor. Les tests ont montré que les signaux
+vers `chromium//&cri-containerd.apparmor.d` étaient également refusés :
+les navigateurs restaient actifs après une requête temporaire ou après
+`sessions.destroy`, même lorsque `sessions.list` renvoyait une liste vide.
+Les erreurs d'arrêt du navigateur sont masquées par `Chrome.quit()` dans
+la version installée d'undetected-chromedriver.
+
+Les deux règles Chromium ont été ajoutées et chargées sur les trois nœuds.
+Le rechargement à chaud seul n'a pas suffi pour les processus existants.
+Après vérification de l'absence de session active, le seul pod FlareSolverr
+a été recréé ; les nœuds, K3s et les autres applications n'ont pas été
+redémarrés. Le profil système `/etc/apparmor.d/chromium` reste inchangé.
+
+Vérifications sur le nouveau pod :
+
+- Création d'une session, navigation vers `https://example.com/`, puis
+  vers l'endpoint de disponibilité Meal Planner : HTTP 200.
+- Destruction de la session et liste des sessions vide.
+- Zéro processus Chromium actif avant et après le test, au lieu d'une
+  accumulation de navigateurs avant correction.
+- Aucun nouveau refus AppArmor Chromium pendant le test.
+- Le nettoyage est aussi vérifié lorsque la navigation échoue.
+
+Le test direct vers `https://www.hellofresh.fr/` renvoie une erreur
+FlareSolverr indiquant un blocage Cloudflare. Il est distinct de l'incident
+AppArmor. Meal Planner continue d'utiliser son client HelloFresh via
+`chronodrive-proxy`, sans FlareSolverr ; l'utilisateur confirme que ce
+chemin fonctionne. Cette intervention ne modifie pas cette intégration.
+Pour un futur usage FlareSolverr / HelloFresh, prévoir le proxy résidentiel
+et une autorisation réseau limitée au pod FlareSolverr : actuellement,
+la NetworkPolicy du proxy autorise uniquement le backend Meal Planner.
 
 ## Retrait lors d'une prochaine mise à jour
 

@@ -23,6 +23,9 @@ profile cri-containerd.apparmor.d flags=(attach_disconnected,mediate_deleted) {
   signal (send,receive) peer=cri-containerd.apparmor.d,
   # Ubuntu can stack the unconfined label onto this same profile.
   signal (send,receive) peer=cri-containerd.apparmor.d//&unconfined,
+  # Ubuntu's named Chromium profile is also stacked onto container confinement.
+  # Chromium needs to signal its children when closing browser sessions.
+  signal (send,receive) peer=chromium//&cri-containerd.apparmor.d,
 
   deny @{PROC}/* w,
   deny @{PROC}/{[^1-9/],[^1-9/][^0-9/],[^1-9s/][^0-9y/][^0-9s/],[^1-9/][^0-9/][^0-9/][^0-9/]*}/** w,
@@ -42,4 +45,6 @@ profile cri-containerd.apparmor.d flags=(attach_disconnected,mediate_deleted) {
 
   ptrace (trace,tracedby,read,readby) peer=cri-containerd.apparmor.d,
   ptrace (trace,tracedby,read,readby) peer=cri-containerd.apparmor.d//&unconfined,
+  # Chromium reads process metadata; this does not grant ptrace trace access.
+  ptrace (read,readby) peer=chromium//&cri-containerd.apparmor.d,
 }
