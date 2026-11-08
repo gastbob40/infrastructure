@@ -9,7 +9,28 @@ spec:
   teamId: infra
   volume:
     size: 10Gi
-  numberOfInstances: 1
+  numberOfInstances: 2
+
+  # Prefer control-plane nodes when scheduling with new volumes.
+  # Existing local volumes retain their node affinity; Patroni elects the primary.
+  nodeAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        preference:
+          matchExpressions:
+            - key: node-role.kubernetes.io/control-plane
+              operator: Exists
+
+  # Keep the two instances on distinct nodes, including with one eligible node.
+  topologySpreadConstraints:
+    - maxSkew: 1
+      minDomains: 2
+      topologyKey: kubernetes.io/hostname
+      whenUnsatisfiable: DoNotSchedule
+      nodeTaintsPolicy: Honor
+      labelSelector:
+        matchLabels:
+          cluster-name: infra-main-cluster
 
   # users: name -> permissions (usually [])
   users:
