@@ -11,7 +11,7 @@ spec:
   source:
     repoURL: https://charts.rustfs.com
     chart: rustfs
-    targetRevision: 1.0.4
+    targetRevision: 1.0.5
     helm:
       skipTests: true
       values: |
