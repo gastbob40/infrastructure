@@ -1,0 +1,119 @@
+---
+apiVersion: ricoberger.de/v1alpha1
+kind: VaultSecret
+metadata:
+  name: minio-secrets
+spec:
+  path: k8s/minio
+  keys:
+    - root-user
+    - root-password
+  type: Opaque
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: books-backup
+spec:
+  schedule: "0 1 * * 1"
+  timeZone: Europe/Paris
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 3600
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 3600
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/component: backup
+        spec:
+          automountServiceAccountToken: false
+          restartPolicy: Never
+          initContainers:
+            - name: snapshot
+              image: crocodilestick/calibre-web-automated:v4.0.8
+              command: [/app/calibre/calibre-debug, -e, /scripts/snapshot.py]
+              env:
+                - name: PYTHONDONTWRITEBYTECODE
+                  value: "1"
+                - name: CALIBRE_CONFIG_DIRECTORY
+                  value: /tmp/calibre-config
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                  ephemeral-storage: 2Gi
+                limits:
+                  memory: 512Mi
+                  ephemeral-storage: 8Gi
+              volumeMounts:
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+                - name: backup
+                  mountPath: /backup
+                - name: config
+                  mountPath: /source/config
+                  readOnly: true
+                - name: library
+                  mountPath: /source/library
+                  readOnly: true
+                - name: ingest
+                  mountPath: /source/ingest
+                  readOnly: true
+          containers:
+            - name: upload
+              image: gastbob40/postgres-backup:latest
+              imagePullPolicy: Always
+              command: [bash, /scripts/upload.sh]
+              env:
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: minio-secrets
+                      key: root-user
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: minio-secrets
+                      key: root-password
+                - name: AWS_ENDPOINT_URL
+                  value: https://api.s3.gastbob40.com
+                - name: AWS_REGION
+                  value: us-east-1
+                - name: S3_BUCKET
+                  value: calibre-backups
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  memory: 512Mi
+              volumeMounts:
+                - name: scripts
+                  mountPath: /scripts
+                  readOnly: true
+                - name: backup
+                  mountPath: /backup
+          volumes:
+            - name: scripts
+              configMap:
+                name: books-backup-scripts
+            - name: backup
+              emptyDir:
+                sizeLimit: 8Gi
+            - name: config
+              persistentVolumeClaim:
+                claimName: books-config
+                readOnly: true
+            - name: library
+              persistentVolumeClaim:
+                claimName: books-library
+                readOnly: true
+            - name: ingest
+              persistentVolumeClaim:
+                claimName: books-ingest
+                readOnly: true

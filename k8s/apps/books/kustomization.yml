@@ -2,8 +2,11 @@
 kind: Kustomization
 namespace: books
 
-commonLabels:
-  component: books
+labels:
+  - pairs:
+      component: books
+    includeSelectors: false
+    includeTemplates: false
 
 resources:
   - namespace.yml
@@ -11,3 +14,11 @@ resources:
   - deployment.yml
   - ingress.yml
   - service.yml
+  - backup.yml
+
+configMapGenerator:
+  - name: books-backup-scripts
+    files:
+      - backup/snapshot.py
+      - backup/verify.py
+      - backup/upload.sh
