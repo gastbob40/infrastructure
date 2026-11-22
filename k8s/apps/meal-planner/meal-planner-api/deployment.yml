@@ -96,6 +96,11 @@ spec:
                 secretKeyRef:
                   name: meal-planner-backend-secrets
                   key: CHRONODRIVE_CATEGORIES_API_KEY
+            - name: CHRONODRIVE_RECIPES_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: meal-planner-backend-secrets
+                  key: CHRONODRIVE_RECIPES_API_KEY
             - name: CHRONODRIVE_SITE_ID
               valueFrom:
                 secretKeyRef:
